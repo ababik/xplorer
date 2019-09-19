@@ -11,12 +11,20 @@ namespace Xplorer.OperationSystems
 
         public void Reveal()
         {
-            var argument = "\"" + Context.Location +"\"";
+            var entry = Context.Entries[Context.ActiveIndex];
+            var location = Context.Location?.TrimEnd('\\');
+            var argument = string.Empty;
 
-            if (Context.Entries[Context.ActiveIndex].Type != NavigationEntryType.NavUpControl)
+            if (location != null)
             {
-                argument = "/select, \"" + Context.Location + "\\" + Context.Entries[Context.ActiveIndex].Name +"\"";
+                argument = "\"" + location +"\"";
+
+                if (entry.Type != NavigationEntryType.NavUpControl)
+                {
+                    argument = "/select, \"" + location + "\\" + entry.Name +"\"";
+                }
             }
+            
 
             System.Diagnostics.Process.Start("explorer.exe", argument);
         }

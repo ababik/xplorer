@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Xplorer
 {
@@ -38,18 +39,25 @@ namespace Xplorer
                     text = entry.Name;
                 }
 
+                if (entry == null)
+                {
+                    RenderMarker(null);
+                    Write(null);
+                    continue;
+                }
+
                 RenderMarker(entry);
 
                 if (index == Context.ActiveIndex)
                 {
-                    Theme.SetCursorColor();
+                    SetCursorColor();
                 }
 
                 Write(text);
 
                 if (index == Context.ActiveIndex)
                 {
-                    Theme.ReSetCursorColor();
+                    ResetCursorColor();
                 }
             }
 
@@ -60,7 +68,7 @@ namespace Xplorer
         {
             Console.SetCursorPosition(0, 0);
 
-            var initialForegroundColor = null as ConsoleColor?;
+            var foregroundColor = null as ConsoleColor?;
 
             if (message == null)
             {
@@ -73,19 +81,19 @@ namespace Xplorer
             }
             else
             {
-                initialForegroundColor = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Red;
+                foregroundColor = Console.ForegroundColor;
+                Console.ForegroundColor = Theme.GetErrorForegroundColor();
             }
 
             Write(message ?? string.Empty);
 
-            if (initialForegroundColor.HasValue)
+            if (foregroundColor.HasValue)
             {
-                Console.ForegroundColor = initialForegroundColor.Value;
+                Console.ForegroundColor = foregroundColor.Value;
             }
         }
 
-        private static void RenderMarker(NavigationEntry entry)
+        private void RenderMarker(NavigationEntry entry)
         {
             var backgroundColor = Console.BackgroundColor;
 
@@ -97,7 +105,7 @@ namespace Xplorer
             {
                 if (entry.Type == NavigationEntryType.Directory || entry.Type == NavigationEntryType.Drive || entry.Type == NavigationEntryType.NavUpControl)
                 {
-                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.BackgroundColor = Theme.GetMarkerDirectoryColor();
                     Console.Write(" ");
                     Console.BackgroundColor = backgroundColor;
                 }
@@ -105,15 +113,15 @@ namespace Xplorer
                 {
                     if (entry.IsExecutable())
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.BackgroundColor = Theme.GetMarkerExecutableColor();
                     }
                     else if (entry.IsDocument())
                     {
-                        Console.BackgroundColor = ConsoleColor.Cyan;
+                        Console.BackgroundColor = Theme.GetMarkerDocumentColor();
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.BackgroundColor = Theme.GetMarkerEmptyColor();
                     }
                     Console.Write(" ");
                     Console.BackgroundColor = backgroundColor;
@@ -121,6 +129,18 @@ namespace Xplorer
             }
 
             Console.Write(" ");
+        }
+
+        private void SetCursorColor()
+        {
+            Console.BackgroundColor = Theme.GetMainForegroundColor();
+            Console.ForegroundColor = Theme.GetMainBackgroundColor();
+        }
+
+        private void ResetCursorColor()
+        {
+            Console.BackgroundColor = Theme.GetMainBackgroundColor();
+            Console.ForegroundColor = Theme.GetMainForegroundColor();
         }
 
         private static void Write(string value)

@@ -41,7 +41,7 @@ namespace Xplorer
                 return new TerminalTheme();
             }
 
-            return new CmdTheme();
+            return new RevertableTheme();
         }
 
         private static OSPlatform DetectPlatform()

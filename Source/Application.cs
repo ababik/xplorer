@@ -209,8 +209,8 @@ namespace Xplorer
         private void ApplyFilter(Char value)
         {
             Context.Filter += value;
-            Context.Entries = Context.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
-            Context.Entries.Insert(0, new NavigationEntry(NavUpControlName, NavigationEntryType.NavUpControl));
+            Context.Entries = FileSystem.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
+            InsertNavUpControl();
             Context.ActiveIndex = 0;
 
             Renderer.Render();
@@ -224,8 +224,8 @@ namespace Xplorer
             }
 
             Context.Filter = Context.Filter.Substring(0, Context.Filter.Length - 1);
-            Context.Entries = Context.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
-            Context.Entries.Insert(0, new NavigationEntry(NavUpControlName, NavigationEntryType.NavUpControl));
+            Context.Entries = FileSystem.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
+            InsertNavUpControl();
             Context.ActiveIndex = 0;
 
             Renderer.Render();
@@ -239,8 +239,8 @@ namespace Xplorer
             }
 
             Context.Filter = string.Empty;
-            Context.Entries = Context.Entries.ToList();
-            Context.Entries.Insert(0, new NavigationEntry(NavUpControlName, NavigationEntryType.NavUpControl));
+            Context.Entries = FileSystem.Entries.ToList();
+            InsertNavUpControl();
             Context.ActiveIndex = 0;
 
             Renderer.Render();
