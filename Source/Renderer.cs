@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Xplorer
@@ -7,6 +8,9 @@ namespace Xplorer
     {
         private Context Context { get; }
         private ITheme Theme { get; }
+        private List<NavigationEntry> PrevEntries { get; set; }
+        private int PrevFirstIndex { get; set; }
+        private int? PrevActiveIndex { get; set; }
 
         public Renderer(Context context, ITheme theme)
         {
@@ -15,56 +19,116 @@ namespace Xplorer
         }
         public void Render()
         {
-            RenderStatus();
-
-            var startIndex = 0;
-            var maxIndex = Console.WindowHeight - 1;
-
-            if (Context.ActiveIndex > maxIndex - 1)
+            if (Context.Entries != PrevEntries)
             {
-                startIndex = Context.ActiveIndex - maxIndex + 1;
+                PrevEntries = Context.Entries;
+                PrevFirstIndex = 0;
+                PrevActiveIndex = null;
             }
 
-            for (var i = 1; i <= maxIndex; i++)
+            var offset = 0;
+
+            offset += RenderStatus();
+
+            var maxItemsCount = Console.WindowHeight - offset;
+            var firstIndex = PrevFirstIndex;
+            var lastIndex = firstIndex + maxItemsCount - 1;
+
+            if (lastIndex >= Context.Entries.Count)
             {
-                Console.SetCursorPosition(0, i);
+                lastIndex = Context.Entries.Count - 1;
+            }
 
-                var index = startIndex + i - 1;
-                var text = string.Empty;
-                var entry = null as NavigationEntry;
+            if (Context.ActiveIndex < firstIndex)
+            {
+                firstIndex = Context.ActiveIndex;
+                lastIndex = firstIndex + maxItemsCount - 1;
 
-                if (index < Context.Entries.Count)
+                if (lastIndex >= Context.Entries.Count)
                 {
-                    entry = Context.Entries[index];
-                    text = entry.Name;
+                    lastIndex = Context.Entries.Count - 1;
+                }
+            }
+
+            if (Context.ActiveIndex > lastIndex)
+            {
+                lastIndex = Context.ActiveIndex;
+                firstIndex = lastIndex - maxItemsCount + 1;
+
+                if (firstIndex < 0)
+                {
+                    firstIndex = 0;
+                }
+            }
+
+            if (PrevFirstIndex == firstIndex && PrevActiveIndex.HasValue)
+            {
+                var isPrevActiveIndexVisible = PrevActiveIndex.Value >= firstIndex && PrevActiveIndex.Value <= lastIndex;
+                if (isPrevActiveIndexVisible)
+                {
+                    var prevEntry = Context.Entries[PrevActiveIndex.Value];
+                    var prevPosition = PrevActiveIndex.Value + offset;
+                    Console.SetCursorPosition(0, prevPosition);
+                    RenderMarker(prevEntry);
+                    Write(prevEntry.Name);
                 }
 
-                if (entry == null)
-                {
-                    RenderMarker(null);
-                    Write(null);
-                    continue;
-                }
-
+                var entry = Context.Entries[Context.ActiveIndex];
+                var position = Context.ActiveIndex + offset;
+                Console.SetCursorPosition(0, position);
                 RenderMarker(entry);
+                SetCursorColor();
+                Write(entry.Name);
+                ResetCursorColor();
+            }
+            else
+            {
+                Debugger.Log(0, "Render", "Rerender!\n");
 
-                if (index == Context.ActiveIndex)
+                for (var i = offset; i <= maxItemsCount; i++)
                 {
-                    SetCursorColor();
-                }
+                    Console.SetCursorPosition(0, i);
 
-                Write(text);
+                    var index = firstIndex + i - offset;
+                    var text = string.Empty;
+                    var entry = null as NavigationEntry;
 
-                if (index == Context.ActiveIndex)
-                {
-                    ResetCursorColor();
+                    if (index < Context.Entries.Count)
+                    {
+                        entry = Context.Entries[index];
+                        text = entry.Name;
+                    }
+
+                    if (entry == null)
+                    {
+                        RenderMarker(null);
+                        Write(null);
+                        continue;
+                    }
+
+                    RenderMarker(entry);
+
+                    if (index == Context.ActiveIndex)
+                    {
+                        SetCursorColor();
+                    }
+
+                    Write(text);
+
+                    if (index == Context.ActiveIndex)
+                    {
+                        ResetCursorColor();
+                    }
                 }
             }
+
+            PrevFirstIndex = firstIndex;
+            PrevActiveIndex = Context.ActiveIndex;
 
             Console.SetCursorPosition(0, 0);
         }
 
-        public void RenderStatus(string message = null)
+        public int RenderStatus(string message = null)
         {
             Console.SetCursorPosition(0, 0);
 
@@ -91,6 +155,8 @@ namespace Xplorer
             {
                 Console.ForegroundColor = foregroundColor.Value;
             }
+
+            return 1;
         }
 
         private void RenderMarker(NavigationEntry entry)
