@@ -211,7 +211,7 @@ namespace Xplorer
             Context.Filter += value;
             Context.Entries = FileSystem.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
             InsertNavUpControl();
-            Context.ActiveIndex = 0;
+            SetFilterActiveItem();
 
             Renderer.Render();
         }
@@ -226,7 +226,7 @@ namespace Xplorer
             Context.Filter = Context.Filter.Substring(0, Context.Filter.Length - 1);
             Context.Entries = FileSystem.Entries.Where(x => x.Name.Contains(Context.Filter, StringComparison.OrdinalIgnoreCase)).ToList();
             InsertNavUpControl();
-            Context.ActiveIndex = 0;
+            SetFilterActiveItem();
 
             Renderer.Render();
         }
@@ -244,6 +244,18 @@ namespace Xplorer
             Context.ActiveIndex = 0;
 
             Renderer.Render();
+        }
+
+        private void SetFilterActiveItem()
+        {
+            if (Context.Entries.Count >= 2 && Context.Entries[0].Type == NavigationEntryType.NavUpControl)
+            {
+                Context.ActiveIndex = 1;
+            }
+            else
+            {
+                Context.ActiveIndex = 0;
+            }
         }
     }
 }
