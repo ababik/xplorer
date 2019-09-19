@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Xplorer.FileSystems;
-using Xplorer.OperationSystems;
 
 namespace Xplorer
 {
@@ -29,9 +27,11 @@ namespace Xplorer
                 Filter = string.Empty
             };
 
-            FileSystem = new FileSystem();
-            OperationSystem = new WindowsOperationSystem(Context);
-            Renderer = new Renderer(Context);
+            var environment = new Environment();
+            FileSystem = environment.CreateFileSystem();
+            OperationSystem = environment.CreateOperationSystem(Context);
+            Theme = environment.CreateTheme();
+            Renderer = new Renderer(Context, Theme);
         }
 
         public void Run()
@@ -41,7 +41,7 @@ namespace Xplorer
                 Console.Clear();
                 Console.CursorVisible = true;
                 Console.SetCursorPosition(0, 0);
-                Environment.Exit(0);
+                System.Environment.Exit(0);
             };
 
             Console.Clear();
@@ -98,7 +98,7 @@ namespace Xplorer
                 return;
             }
 
-            if (entry.IsExecutable())
+            if (FileSystem.IsExecutable)
             {
                 return;
             }

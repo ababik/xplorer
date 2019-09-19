@@ -5,10 +5,12 @@ namespace Xplorer
     internal class Renderer
     {
         private Context Context { get; }
+        private ITheme Theme { get; }
 
-        public Renderer(Context context)
+        public Renderer(Context context, ITheme theme)
         {
             Context = context;
+            Theme = theme;
         }
         public void Render()
         {
@@ -40,16 +42,14 @@ namespace Xplorer
 
                 if (index == Context.ActiveIndex)
                 {
-                    //SwapColor();
-                    SetColor();
+                    Theme.SetCursorColor();
                 }
 
                 Write(text);
 
                 if (index == Context.ActiveIndex)
                 {
-                    //SwapColor();
-                    ResetColor();
+                    Theme.ReSetCursorColor();
                 }
             }
 
@@ -126,25 +126,6 @@ namespace Xplorer
         private static void Write(string value)
         {
             Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 3));
-        }
-
-        private static void SwapColor()
-        {
-            var backgroundColor = Console.BackgroundColor;
-            var foregroundColor = Console.ForegroundColor;
-            Console.BackgroundColor = foregroundColor;
-            Console.ForegroundColor = backgroundColor;
-        }
-
-        private static void SetColor()
-        {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        private static void ResetColor()
-        {
-            Console.ResetColor();
         }
     }
 }
