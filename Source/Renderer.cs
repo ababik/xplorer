@@ -63,18 +63,14 @@ namespace Xplorer
 
             if (PrevFirstIndex == firstIndex && PrevActiveIndex.HasValue)
             {
-                var isPrevActiveIndexVisible = PrevActiveIndex.Value >= firstIndex && PrevActiveIndex.Value <= lastIndex;
-                if (isPrevActiveIndexVisible)
-                {
-                    var prevEntry = Context.Entries[PrevActiveIndex.Value];
-                    var prevPosition = PrevActiveIndex.Value + offset;
-                    Console.SetCursorPosition(0, prevPosition);
-                    RenderMarker(prevEntry);
-                    Write(prevEntry.Name);
-                }
+                var prevEntry = Context.Entries[PrevActiveIndex.Value];
+                var prevPosition = PrevActiveIndex.Value - firstIndex + offset;
+                Console.SetCursorPosition(0, prevPosition);
+                RenderMarker(prevEntry);
+                Write(prevEntry.Name);
 
                 var entry = Context.Entries[Context.ActiveIndex];
-                var position = Context.ActiveIndex + offset;
+                var position = Context.ActiveIndex  - firstIndex + offset;
                 Console.SetCursorPosition(0, position);
                 RenderMarker(entry);
                 SetCursorColor();
@@ -83,8 +79,6 @@ namespace Xplorer
             }
             else
             {
-                Debugger.Log(0, "Render", "Rerender!\n");
-
                 for (var i = offset; i <= maxItemsCount; i++)
                 {
                     Console.SetCursorPosition(0, i);
