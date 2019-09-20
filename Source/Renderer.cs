@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Xplorer
 {
@@ -11,6 +10,8 @@ namespace Xplorer
         private List<NavigationEntry> PrevEntries { get; set; }
         private int PrevFirstIndex { get; set; }
         private int? PrevActiveIndex { get; set; }
+
+        private int ToolbarHeight { get; set; } = 1;
 
         public Renderer(Context context, ITheme theme)
         {
@@ -26,11 +27,9 @@ namespace Xplorer
                 PrevActiveIndex = null;
             }
 
-            var offset = 0;
+            RenderStatus();
 
-            offset += RenderStatus();
-
-            var maxItemsCount = Console.WindowHeight - offset;
+            var maxItemsCount = Console.WindowHeight - ToolbarHeight;
             var firstIndex = PrevFirstIndex;
             var lastIndex = firstIndex + maxItemsCount - 1;
 
@@ -64,13 +63,13 @@ namespace Xplorer
             if (PrevFirstIndex == firstIndex && PrevActiveIndex.HasValue)
             {
                 var prevEntry = Context.Entries[PrevActiveIndex.Value];
-                var prevPosition = PrevActiveIndex.Value - firstIndex + offset;
+                var prevPosition = PrevActiveIndex.Value - firstIndex + ToolbarHeight;
                 Console.SetCursorPosition(0, prevPosition);
                 RenderMarker(prevEntry);
                 Write(prevEntry.Name);
 
                 var entry = Context.Entries[Context.ActiveIndex];
-                var position = Context.ActiveIndex  - firstIndex + offset;
+                var position = Context.ActiveIndex  - firstIndex + ToolbarHeight;
                 Console.SetCursorPosition(0, position);
                 RenderMarker(entry);
                 SetCursorColor();
@@ -79,11 +78,11 @@ namespace Xplorer
             }
             else
             {
-                for (var i = offset; i <= maxItemsCount; i++)
+                for (var i = ToolbarHeight; i <= maxItemsCount; i++)
                 {
                     Console.SetCursorPosition(0, i);
 
-                    var index = firstIndex + i - offset;
+                    var index = firstIndex + i - ToolbarHeight;
                     var text = string.Empty;
                     var entry = null as NavigationEntry;
 
@@ -122,7 +121,7 @@ namespace Xplorer
             Console.SetCursorPosition(0, 0);
         }
 
-        public int RenderStatus(string message = null)
+        public void RenderStatus(string message = null)
         {
             Console.SetCursorPosition(0, 0);
 
@@ -149,8 +148,6 @@ namespace Xplorer
             {
                 Console.ForegroundColor = foregroundColor.Value;
             }
-
-            return 1;
         }
 
         private void RenderMarker(NavigationEntry entry)
@@ -205,7 +202,7 @@ namespace Xplorer
 
         private static void Write(string value)
         {
-            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 3));
+            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 2));
         }
     }
 }

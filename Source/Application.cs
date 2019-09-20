@@ -112,7 +112,7 @@ namespace Xplorer
 
             if (entry.Type == NavigationEntryType.NavUpControl)
             {
-                var name = Path.GetFileName(location);
+                var name = (Context.Location == null) ? location : Path.GetFileName(location);
                 entry = Context.Entries.SingleOrDefault(x => x.Name == name);
                 if (entry != null)
                 {
