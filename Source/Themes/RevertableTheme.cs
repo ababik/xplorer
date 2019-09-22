@@ -7,28 +7,20 @@ namespace Xplorer.Themes
         private ConsoleColor MainBackgroundColor { get; }
         private ConsoleColor MainForegroundColor { get; }
 
+        public static bool IsSupported => (int)Console.BackgroundColor != -1;
+
         public RevertableTheme()
         {
             MainBackgroundColor = Console.BackgroundColor;
             MainForegroundColor = Console.ForegroundColor;
         }
 
-        public ConsoleColor GetMainBackgroundColor()
-        {
-            return MainBackgroundColor;
-        }
-
-        public ConsoleColor GetMainForegroundColor()
+        public virtual ConsoleColor GetCursorBackgroundColor()
         {
             return MainForegroundColor;
         }
 
-        public ConsoleColor GetCursorBackgroundColor()
-        {
-            return MainForegroundColor;
-        }
-
-        public ConsoleColor GetCursorForegroundColor()
+        public virtual ConsoleColor GetCursorForegroundColor()
         {
             return MainBackgroundColor;
         }

@@ -132,8 +132,6 @@ namespace Xplorer
         {
             Console.SetCursorPosition(0, 0);
 
-            var foregroundColor = null as ConsoleColor?;
-
             if (message == null)
             {
                 message = Context.Location;
@@ -145,22 +143,16 @@ namespace Xplorer
             }
             else
             {
-                foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = Theme.GetErrorForegroundColor();
             }
 
-            Write(message ?? string.Empty);
+            Write(message, 0);
 
-            if (foregroundColor.HasValue)
-            {
-                Console.ForegroundColor = foregroundColor.Value;
-            }
+            Console.ResetColor();
         }
 
         private void RenderMarker(NavigationEntry entry)
         {
-            var backgroundColor = Console.BackgroundColor;
-
             if (entry == null)
             {
                 Console.Write(" ");
@@ -171,7 +163,7 @@ namespace Xplorer
                 {
                     Console.BackgroundColor = Theme.GetMarkerDirectoryColor();
                     Console.Write(" ");
-                    Console.BackgroundColor = backgroundColor;
+                    Console.ResetColor();
                 }
                 else
                 {
@@ -188,7 +180,7 @@ namespace Xplorer
                         Console.BackgroundColor = Theme.GetMarkerEmptyColor();
                     }
                     Console.Write(" ");
-                    Console.BackgroundColor = backgroundColor;
+                    Console.ResetColor();
                 }
             }
 
@@ -274,19 +266,18 @@ namespace Xplorer
 
         private void SetCursorColor()
         {
-            Console.BackgroundColor = Theme.GetMainForegroundColor();
-            Console.ForegroundColor = Theme.GetMainBackgroundColor();
+            Console.BackgroundColor = Theme.GetCursorBackgroundColor();
+            Console.ForegroundColor = Theme.GetCursorForegroundColor();
         }
 
         private void ResetCursorColor()
         {
-            Console.BackgroundColor = Theme.GetMainBackgroundColor();
-            Console.ForegroundColor = Theme.GetMainForegroundColor();
+            Console.ResetColor();
         }
 
-        private static void Write(string value)
+        private static void Write(string value, int leftPadding = 3)
         {
-            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 3));
+            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - leftPadding));
         }
     }
 }

@@ -4,8 +4,6 @@ namespace Xplorer
 {
     internal interface ITheme
     {
-        ConsoleColor GetMainBackgroundColor();
-        ConsoleColor GetMainForegroundColor();
         ConsoleColor GetCursorBackgroundColor();
         ConsoleColor GetCursorForegroundColor();
         ConsoleColor GetErrorForegroundColor();

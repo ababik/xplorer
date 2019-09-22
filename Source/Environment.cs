@@ -36,12 +36,12 @@ namespace Xplorer
 
         public ITheme CreateTheme()
         {
-            if (Platform == OSPlatform.OSX)
+            if (RevertableTheme.IsSupported)
             {
-                return new TerminalTheme();
+                return new RevertableTheme();
             }
 
-            return new RevertableTheme();
+            return new TerminalTheme();
         }
 
         private static OSPlatform DetectPlatform()
