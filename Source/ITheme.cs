@@ -13,5 +13,7 @@ namespace Xplorer
         ConsoleColor GetMarkerExecutableColor();
         ConsoleColor GetMarkerDocumentColor();
         ConsoleColor GetMarkerEmptyColor();
+        ConsoleColor GetScrollBackgroundColor();
+        ConsoleColor GetScrollGripColor();
     }
 }

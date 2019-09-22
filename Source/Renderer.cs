@@ -7,9 +7,13 @@ namespace Xplorer
     {
         private Context Context { get; }
         private ITheme Theme { get; }
+        private int PrevWindowWidth { get; set; }
+        private int PrevWindowHeight { get; set; }
         private List<NavigationEntry> PrevEntries { get; set; }
         private int PrevFirstIndex { get; set; }
         private int? PrevActiveIndex { get; set; }
+        private int PrevScrollStartIndex { get; set; }
+        private int PrevScrollEndIndex { get; set; }
 
         private int ToolbarHeight { get; set; } = 1;
 
@@ -17,14 +21,16 @@ namespace Xplorer
         {
             Context = context;
             Theme = theme;
+
+            PrevWindowWidth = Console.WindowWidth;
+            PrevWindowHeight = Console.WindowHeight;
         }
+
         public void Render()
         {
-            if (Context.Entries != PrevEntries)
+            if (IsResetPrevsRequired())
             {
-                PrevEntries = Context.Entries;
-                PrevFirstIndex = 0;
-                PrevActiveIndex = null;
+                ResetPrevs();
             }
 
             RenderStatus();
@@ -115,8 +121,9 @@ namespace Xplorer
                 }
             }
 
-            PrevFirstIndex = firstIndex;
-            PrevActiveIndex = Context.ActiveIndex;
+            SetPrevs(firstIndex);
+
+            RenderScroll(firstIndex);
 
             Console.SetCursorPosition(0, 0);
         }
@@ -168,11 +175,11 @@ namespace Xplorer
                 }
                 else
                 {
-                    if (entry.IsExecutable())
+                    if (entry.IsExecutable)
                     {
                         Console.BackgroundColor = Theme.GetMarkerExecutableColor();
                     }
-                    else if (entry.IsDocument())
+                    else if (entry.IsDocument)
                     {
                         Console.BackgroundColor = Theme.GetMarkerDocumentColor();
                     }
@@ -186,6 +193,83 @@ namespace Xplorer
             }
 
             Console.Write(" ");
+        }
+
+        private void RenderScroll(int windowPosition)
+        {
+            var contentSize = Context.Entries.Count;
+            var windowSize = Console.WindowHeight - ToolbarHeight;
+            var trackSize = windowSize;
+            var windowContentRatio = (float)windowSize / contentSize;
+            var gripSize = (int)(trackSize * windowContentRatio);
+
+            var minimalGripSize = 1;
+            var maximumGripSize = trackSize;
+
+            if (gripSize < minimalGripSize)
+            {
+                gripSize = minimalGripSize;
+            }
+
+            if (gripSize > maximumGripSize)
+            {
+                gripSize = maximumGripSize;
+            }
+
+            var windowScrollAreaSize = contentSize - windowSize;
+            if (windowScrollAreaSize < 0)
+            {
+                windowScrollAreaSize = windowSize;
+            }
+
+            var windowPositionRatio = (float)windowPosition / windowScrollAreaSize;
+            var trackScrollAreaSize = trackSize - gripSize;
+            var start = (int)(trackScrollAreaSize * windowPositionRatio);
+            var end = start + gripSize;
+
+            if (start == PrevScrollStartIndex && end == PrevScrollEndIndex)
+            {
+                return;
+            }
+
+            PrevScrollStartIndex = start;
+            PrevScrollEndIndex = end;
+
+            for (var i = ToolbarHeight; i <= windowSize; i++)
+            {
+                var index = i - ToolbarHeight;
+                var color = index >= start && index < end ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
+                var initColor = Console.BackgroundColor;
+                Console.SetCursorPosition(Console.WindowWidth - 1, i);
+                Console.BackgroundColor = color;
+                Console.Write(" ");
+                Console.BackgroundColor = initColor;
+            }
+        }
+
+        private void SetPrevs(int firstIndex)
+        {
+            PrevFirstIndex = firstIndex;
+            PrevActiveIndex = Context.ActiveIndex;
+            PrevWindowWidth = Console.WindowWidth;
+            PrevWindowHeight = Console.WindowHeight;
+        }
+
+        private void ResetPrevs()
+        {
+            PrevEntries = Context.Entries;
+            PrevFirstIndex = 0;
+            PrevActiveIndex = null;
+            PrevScrollStartIndex = 0;
+            PrevScrollEndIndex = 0;
+        }
+
+        private bool IsResetPrevsRequired()
+        {
+            return
+                Context.Entries != PrevEntries ||
+                Console.WindowWidth != PrevWindowWidth ||
+                Console.WindowHeight != PrevWindowHeight;
         }
 
         private void SetCursorColor()
@@ -202,7 +286,7 @@ namespace Xplorer
 
         private static void Write(string value)
         {
-            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 2));
+            Console.Write((value ?? string.Empty).PadRight(Console.WindowWidth - 3));
         }
     }
 }

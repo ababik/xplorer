@@ -6,13 +6,13 @@ namespace Xplorer.FileSystems
 {
     internal class FileSystem : IFileSystem
     {
-        public bool IsExecutable { get; private set; }
+        public bool Executed { get; private set; }
         public string Location { get; private set; }
         public NavigationEntry[] Entries { get; private set; }
 
         public void Navigate(string location)
         {
-            IsExecutable = false;
+            Executed = false;
 
             var isUndefined = location == null && Location == null;
             var isNavUp = location == null && Location != null;
@@ -34,7 +34,7 @@ namespace Xplorer.FileSystems
 
                     if (attributes.HasFlag(System.IO.FileAttributes.Directory) == false)
                     {
-                        IsExecutable = true;
+                        Executed = true;
                         ExecuteFile(location);
                         return;
                     }

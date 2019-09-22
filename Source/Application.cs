@@ -98,7 +98,7 @@ namespace Xplorer
                 return;
             }
 
-            if (FileSystem.IsExecutable)
+            if (FileSystem.Executed)
             {
                 return;
             }
