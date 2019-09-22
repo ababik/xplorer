@@ -59,7 +59,7 @@ namespace Xplorer
             {
                 var input = Console.ReadKey(true);
 
-                if (input.Key == ConsoleKey.Enter && input.Modifiers == ConsoleModifiers.Control)
+                if (input.Key == ConsoleKey.Spacebar)
                 {
                     OperationSystem.Reveal();
                     continue;

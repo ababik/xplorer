@@ -11,6 +11,8 @@ namespace Xplorer.OperationSystems
 
         public void Reveal()
         {
+            var argument = "-R \"" + Context.GetActiveLocation() + "\"";
+            System.Diagnostics.Process.Start("open", argument);
         }
     }
 }
