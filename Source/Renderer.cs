@@ -84,7 +84,7 @@ namespace Xplorer
             }
             else
             {
-                for (var i = ToolbarHeight; i <= maxItemsCount; i++)
+                for (var i = ToolbarHeight; i < Console.WindowHeight; i++)
                 {
                     Console.SetCursorPosition(0, i);
 
@@ -134,7 +134,7 @@ namespace Xplorer
 
             if (message == null)
             {
-                message = Context.Location;
+                message = Context.Location ?? System.Environment.UserName + "@" + System.Environment.MachineName;
 
                 if (Context.Filter != string.Empty)
                 {
@@ -227,16 +227,16 @@ namespace Xplorer
             PrevScrollStartIndex = start;
             PrevScrollEndIndex = end;
 
-            for (var i = ToolbarHeight; i <= windowSize; i++)
+            for (var i = ToolbarHeight; i < Console.WindowHeight; i++)
             {
                 var index = i - ToolbarHeight;
                 var color = index >= start && index < end ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
-                var initColor = Console.BackgroundColor;
                 Console.SetCursorPosition(Console.WindowWidth - 1, i);
                 Console.BackgroundColor = color;
                 Console.Write(" ");
-                Console.BackgroundColor = initColor;
             }
+
+            Console.ResetColor();
         }
 
         private void SetPrevs(int firstIndex)
