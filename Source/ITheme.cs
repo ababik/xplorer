@@ -2,7 +2,7 @@ using System;
 
 namespace Xplorer
 {
-    internal interface ITheme
+    public interface ITheme
     {
         ConsoleColor GetCursorBackgroundColor();
         ConsoleColor GetCursorForegroundColor();

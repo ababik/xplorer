@@ -1,6 +1,6 @@
 namespace Xplorer
 {
-    internal interface IFileSystem
+    public interface IFileSystem
     {
         bool Executed { get; }
         string Location { get; }

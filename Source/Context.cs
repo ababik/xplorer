@@ -1,29 +1,73 @@
-using System.Collections.Generic;
-using System.IO;
+using System.Runtime.InteropServices;
+using Remutable;
+using Xplorer.FileSystems;
+using Xplorer.OperationSystems;
+using Xplorer.Themes;
 
 namespace Xplorer
 {
-    internal class Context
+    public class Context
     {
-        public string Location { get; set; }
-        public List<NavigationEntry> Entries { get; set; }
-        public int ActiveIndex { get; set; }
-        public string Filter { get; set; }
+        public IFileSystem PrimaryFileSystem { get; }
+        public IFileSystem SecondaryFileSystem { get; }
+        public IOperationSystem OperationSystem { get; }
+        public ITheme Theme { get; }
+        public Remute Remute { get; }
+        private OSPlatform Platform { get; }
 
-        public string GetActiveLocation()
+        public Context()
         {
-            var result = Location;
-            var entry = Entries[ActiveIndex];
+            Platform = DetectPlatform();
+            PrimaryFileSystem = CreateFileSystem();
+            SecondaryFileSystem = CreateFileSystem();
+            OperationSystem = CreateOperationSystem();
+            Theme = CreateTheme();
+            Remute = Remute.Default;
+        }
 
-            if (Location != null && entry != null)
+        private static OSPlatform DetectPlatform()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (entry.Type != NavigationEntryType.NavUpControl)
-                {
-                    result = Path.Combine(Location, entry.Name);
-                }
+                return OSPlatform.Windows;
             }
 
-            return result;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return OSPlatform.OSX;
+            }
+
+            return OSPlatform.Linux;
+        }
+
+        private IFileSystem CreateFileSystem()
+        {
+            return new FileSystem();
+        }
+
+        private IOperationSystem CreateOperationSystem()
+        {
+            if (Platform == OSPlatform.Windows)
+            {
+                return new WindowsOperationSystem();
+            }
+
+            if (Platform == OSPlatform.OSX)
+            {
+                return new OsxOperationSystem();
+            }
+
+            return new LinuxOperationSystem();
+        }
+
+        private ITheme CreateTheme()
+        {
+            if (RevertableTheme.IsSupported)
+            {
+                return new RevertableTheme();
+            }
+
+            return new TerminalTheme();
         }
     }
 }

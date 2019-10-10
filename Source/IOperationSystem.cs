@@ -1,7 +1,9 @@
+using Xplorer.Models;
+
 namespace Xplorer
 {
-    internal interface IOperationSystem
+    public interface IOperationSystem
     {
-        void Reveal();
+        void Reveal(NavigationModel navigation);
     }
 }

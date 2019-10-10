@@ -1,24 +1,20 @@
+using Xplorer.Actions;
+using Xplorer.Models;
+
 namespace Xplorer.OperationSystems
 {
     internal class WindowsOperationSystem : IOperationSystem
     {
-        private Context Context { get; }
-
-        public WindowsOperationSystem(Context context)
+        public void Reveal(NavigationModel navigation)
         {
-            Context = context;
-        }
-
-        public void Reveal()
-        {
-            var location = Context.GetActiveLocation();
+            var location = NavigationActions.GetActiveLocation(navigation);
             var argument = string.Empty;
 
             if (location != null)
             {
                 argument = "\"" + location + "\"";
 
-                var entry = Context.Entries[Context.ActiveIndex];
+                var entry = navigation.EntryList.Items[navigation.ActiveIndex].Entry;
                 
                 if (entry.Type != NavigationEntryType.NavUpControl)
                 {

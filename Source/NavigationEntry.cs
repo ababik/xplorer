@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Xplorer
 {
-    internal class NavigationEntry
+    public class NavigationEntry
     {
         private static HashSet<string> Executables = new HashSet<string>()
         {
@@ -15,6 +15,8 @@ namespace Xplorer
             "pdf", "doc", "docx", "html", "htm", "xls", "xlsx", "ppt", "pptx",
             "txt", "log", "xml", "json"
         };
+
+        public static string NavUpControlName { get; } = "..";
 
         public string Name { get; }
         public string Extension { get; }

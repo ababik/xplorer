@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -57,9 +58,11 @@ namespace Xplorer.FileSystems
                 var files = System.IO.Directory.GetFiles(location)
                     .Select(ConvertFile)
                     .OrderBy(x => x.Name);
-                entries = directories
-                    .Concat(files)
-                    .ToArray();
+                var list = new List<NavigationEntry>();
+                list.Add(new NavigationEntry(NavigationEntry.NavUpControlName, NavigationEntryType.NavUpControl));
+                list.AddRange(directories);
+                list.AddRange(files);
+                entries = list.ToArray();
             }
 
             Location = location;
