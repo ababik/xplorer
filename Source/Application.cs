@@ -13,12 +13,12 @@ namespace Xplorer
         }
 
         private Context Context { get; }
-        private MasterComponent Component { get; }
+        private MasterComponent MasterComponent { get; }
 
         private Application()
         {
             Context = new Context();
-            Component = new MasterComponent(Context.Theme);
+            MasterComponent = new MasterComponent(Context.Theme);
         }
 
         public void Run()
@@ -34,11 +34,11 @@ namespace Xplorer
             Console.Clear();
             Console.CursorVisible = false;
 
-            var model = NavigationActions.CreateMasterModel(Context);
+            var model = NavigationActions.CreateModel(Context);
 
             while (true)
             {
-                Component.Render(model);
+                MasterComponent.Render(model);
                 Console.SetCursorPosition(0, 0);
 
                 var input = Console.ReadKey(true);

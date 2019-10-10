@@ -8,10 +8,10 @@ namespace Xplorer.Components
 
         public NavigationEntryListComponent(ITheme theme) : base(theme)
         {
-            var maxItemsCount = Layout.GetNavigationEntryListHeight();
-            Components = new NavigationEntryListItemComponent[maxItemsCount];
+            var height = Layout.GetNavigationEntryListHeight();
+            Components = new NavigationEntryListItemComponent[height];
 
-            for (var i = 0; i < maxItemsCount; i++)
+            for (var i = 0; i < height; i++)
             {
                 Components[i] = new NavigationEntryListItemComponent(Theme);
             }
@@ -24,14 +24,8 @@ namespace Xplorer.Components
                 var component = Components[i];
                 component.Position(Top + i, Left, Width, 1);
 
-                if (i < Model.Items.Length)
-                {
-                    component.Render(Model.Items[i]);
-                }
-                else
-                {
-                    component.Render(null);
-                }
+                var value = i < Model.Items.Length ? Model.Items[i] : null;
+                component.Render(value);
             }
         }
     }

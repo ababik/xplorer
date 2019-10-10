@@ -1,3 +1,4 @@
+/*
 using System;
 using System.IO;
 using System.Linq;
@@ -74,7 +75,7 @@ namespace Xplorer.Actions
             var fileSystem = GetActiveFileSystem(context, model);
             var navigation = GetActiveNavigationModel(model);
 
-            var entry = navigation.ActiveNavigationEntry;
+            var entry = navigation.ActiveEntry;
             var location = navigation.Location;
             
             try
@@ -115,11 +116,11 @@ namespace Xplorer.Actions
             navigation = context.Remute.With(navigation, x => x.NavigationEntries, fileSystem.Entries);
             navigation = context.Remute.With(navigation, x => x.Filter, string.Empty);
             navigation = context.Remute.With(navigation, x => x.Location, fileSystem.Location);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = context.Remute.With(navigation, x => x.EntryList.Items, items);
             navigation = navigation.Remute(x => x.Statusbar, CreateStatusbarModel(navigation));
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -202,21 +203,21 @@ namespace Xplorer.Actions
             var fileSystem = GetActiveFileSystem(context, model);
             var navigation = GetActiveNavigationModel(model);
 
-            if (navigation.ActiveIndex == navigation.NavigationEntries.Length - 1)
+            if (navigation.ActiveIndex == navigation.Entries.Length - 1)
             {
                 return model;
             }
 
             var activeIndex = navigation.ActiveIndex + 1;
-            var firstIndex = navigation.EntryList.FirstIndex;
-            var entries = SliceVisibleEntries(navigation.NavigationEntries, activeIndex, ref firstIndex, out var entryListActiveIndex);
+            var firstIndex = navigation.VisibleEntryList.FirstIndex;
+            var entries = SliceVisibleEntries(navigation.Entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveIndex, activeIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -233,15 +234,15 @@ namespace Xplorer.Actions
             }
 
             var activeIndex = navigation.ActiveIndex - 1;
-            var firstIndex = navigation.EntryList.FirstIndex;
-            var entries = SliceVisibleEntries(navigation.NavigationEntries, activeIndex, ref firstIndex, out var entryListActiveIndex);
+            var firstIndex = navigation.VisibleEntryList.FirstIndex;
+            var entries = SliceVisibleEntries(navigation.Entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveIndex, activeIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -253,15 +254,15 @@ namespace Xplorer.Actions
             var navigation = GetActiveNavigationModel(model);
 
             var activeIndex = 0;
-            var firstIndex = navigation.EntryList.FirstIndex;
-            var entries = SliceVisibleEntries(navigation.NavigationEntries, activeIndex, ref firstIndex, out var entryListActiveIndex);
+            var firstIndex = navigation.VisibleEntryList.FirstIndex;
+            var entries = SliceVisibleEntries(navigation.Entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveIndex, activeIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -272,16 +273,16 @@ namespace Xplorer.Actions
             var fileSystem = GetActiveFileSystem(context, model);
             var navigation = GetActiveNavigationModel(model);
 
-            var activeIndex = navigation.NavigationEntries.Length == 0 ? 0 : navigation.NavigationEntries.Length - 1;
-            var firstIndex = navigation.EntryList.FirstIndex;
-            var entries = SliceVisibleEntries(navigation.NavigationEntries, activeIndex, ref firstIndex, out var entryListActiveIndex);
+            var activeIndex = navigation.Entries.Length == 0 ? 0 : navigation.Entries.Length - 1;
+            var firstIndex = navigation.VisibleEntryList.FirstIndex;
+            var entries = SliceVisibleEntries(navigation.Entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveIndex, activeIndex);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -351,17 +352,17 @@ namespace Xplorer.Actions
             var firstIndex = 0;
             entries = SliceVisibleEntries(entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = navigation.Remute(x => x.ActiveIndex, activeIndex);
-            navigation = navigation.Remute(x => x.NavigationEntries, entries);
+            navigation = navigation.Remute(x => x.Entries, entries);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
             navigation = context.Remute.With(navigation, x => x.Filter, filter);          
 
             var statusbar = CreateStatusbarModel(navigation);
             navigation = navigation.Remute(x => x.Statusbar, statusbar);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -385,17 +386,17 @@ namespace Xplorer.Actions
             var firstIndex = 0;
             entries = SliceVisibleEntries(entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = navigation.Remute(x => x.ActiveIndex, activeIndex);
-            navigation = navigation.Remute(x => x.NavigationEntries, entries);
+            navigation = navigation.Remute(x => x.Entries, entries);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
             navigation = context.Remute.With(navigation, x => x.Filter, filter);
 
             var statusbar = CreateStatusbarModel(navigation);
             navigation = navigation.Remute(x => x.Statusbar, statusbar);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -416,17 +417,17 @@ namespace Xplorer.Actions
             var firstIndex = 0;
             entries = SliceVisibleEntries(entries, activeIndex, ref firstIndex, out var entryListActiveIndex);
             var items = Convert(entries, entryListActiveIndex);
-            navigation = navigation.Remute(x => x.EntryList.Items, items);
-            navigation = navigation.Remute(x => x.EntryList.FirstIndex, firstIndex);
+            navigation = navigation.Remute(x => x.VisibleEntryList.Items, items);
+            navigation = navigation.Remute(x => x.VisibleEntryList.FirstIndex, firstIndex);
             navigation = navigation.Remute(x => x.ActiveIndex, activeIndex);
-            navigation = navigation.Remute(x => x.NavigationEntries, entries);
+            navigation = navigation.Remute(x => x.Entries, entries);
             navigation = context.Remute.With(navigation, x => x.ActiveNavigationEntry, entryListActiveIndex);
             navigation = context.Remute.With(navigation, x => x.Filter, string.Empty);
 
             var statusbar = CreateStatusbarModel(navigation);
             navigation = navigation.Remute(x => x.Statusbar, statusbar);
 
-            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.NavigationEntries.Length, Layout.GetNavigationEntryListHeight());
+            var scrollbar = CalculateScrollbarModel(firstIndex, navigation.Entries.Length, Layout.GetNavigationEntryListHeight());
             navigation = navigation.Remute(x => x.Scrollbar, scrollbar);
 
             return SetActiveNavigationModel(context, model, navigation);
@@ -473,7 +474,7 @@ namespace Xplorer.Actions
         public static string GetActiveLocation(NavigationModel model)
         {
             var result = model.Location;
-            var entry = model.EntryList.Items[model.ActiveIndex].Entry;
+            var entry = model.VisibleEntryList.Items[model.ActiveIndex].Entry;
 
             if (model.Location != null && entry != null)
             {
@@ -520,3 +521,4 @@ namespace Xplorer.Actions
         }
     }
 }
+*/

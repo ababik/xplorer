@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Remutable;
 using Xplorer.FileSystems;
 using Xplorer.OperationSystems;
 using Xplorer.Themes;
@@ -12,7 +11,6 @@ namespace Xplorer
         public IFileSystem SecondaryFileSystem { get; }
         public IOperationSystem OperationSystem { get; }
         public ITheme Theme { get; }
-        public Remute Remute { get; }
         private OSPlatform Platform { get; }
 
         public Context()
@@ -22,7 +20,6 @@ namespace Xplorer
             SecondaryFileSystem = CreateFileSystem();
             OperationSystem = CreateOperationSystem();
             Theme = CreateTheme();
-            Remute = Remute.Default;
         }
 
         private static OSPlatform DetectPlatform()

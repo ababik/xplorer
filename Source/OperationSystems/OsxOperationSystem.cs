@@ -14,7 +14,7 @@ namespace Xplorer.OperationSystems
             {
                 argument = "\"" + location + "\"";
 
-                var entry = navigation.EntryList.Items[navigation.ActiveIndex].Entry;
+                var entry = navigation.ActiveEntry;
                 
                 if (entry.Type != NavigationEntryType.NavUpControl)
                 {

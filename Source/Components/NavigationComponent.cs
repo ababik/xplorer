@@ -24,7 +24,7 @@ namespace Xplorer.Components
             Scrollbar.Render(Model.Scrollbar);
 
             NavigationEntryList.Position(Top + 1, Left, Width - 1, Height - 1);
-            NavigationEntryList.Render(Model.EntryList);
+            NavigationEntryList.Render(Model.VisibleEntryList);
         }
     }
 }

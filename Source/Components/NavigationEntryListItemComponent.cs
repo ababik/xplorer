@@ -20,8 +20,6 @@ namespace Xplorer.Components
 
         public override void Render()
         {
-            //System.Diagnostics.Debugger.Log(0, "Render", $"Render: {Model?.Entry?.Name}\n");
-
             Console.SetCursorPosition(Left, Top);
             
             if (Model == null)

@@ -20,8 +20,6 @@ namespace Xplorer.Components
         
         public override void Render()
         {
-            //System.Diagnostics.Debugger.Log(0, "Render", $"Scroll\n");
-
             for (var i = 0; i < Height; i++)
             {
                 var index = i + Top;

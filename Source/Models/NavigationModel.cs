@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Xplorer.Models
 {
     public class NavigationModel
@@ -9,23 +7,23 @@ namespace Xplorer.Models
         public string Filter { get; }
         public bool IsActive { get; }
         public int ActiveIndex { get; }
-        public NavigationEntry ActiveNavigationEntry { get; }
-        public NavigationEntry[] NavigationEntries { get; }
+        public NavigationEntry ActiveEntry { get; }
+        public NavigationEntry[] Entries { get; }
+        public NavigationEntryListModel VisibleEntryList { get; }
         public StatusbarModel Statusbar { get; }
-        public NavigationEntryListModel EntryList { get; }
         public ScrollbarModel Scrollbar { get; }
 
-        public NavigationModel(string message, string location, string filter, bool isActive, int activeIndex, NavigationEntry activeNavigationEntry, NavigationEntry[] navigationEntries, StatusbarModel statusbar, NavigationEntryListModel entryList, ScrollbarModel scrollbar)
+        public NavigationModel(string message, string location, string filter, bool isActive, int activeIndex, NavigationEntry activeEntry, NavigationEntry[] entries, NavigationEntryListModel visibleEntryList, StatusbarModel statusbar, ScrollbarModel scrollbar)
         {
             Message = message;
             Location = location;
             Filter = filter;
             IsActive = isActive;
             ActiveIndex = activeIndex;
-            ActiveNavigationEntry = activeNavigationEntry;
-            NavigationEntries = navigationEntries;
+            ActiveEntry = activeEntry;
+            Entries = entries;
+            VisibleEntryList = visibleEntryList;
             Statusbar = statusbar;
-            EntryList = entryList;
             Scrollbar = scrollbar;
         }
     }

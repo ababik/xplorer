@@ -5,14 +5,14 @@ namespace Xplorer.Components
 {
     public class MasterComponent : Component<MasterModel>
     {
-        private PrimaryNavigationComponent PrimaryNavigation { get; }
-        private SecondaryNavigationComponent SecondaryNavigation { get; }
+        private NavigationComponent PrimaryNavigation { get; }
+        private NavigationComponent SecondaryNavigation { get; }
         private ToolbarComponent Toolbar { get; }
 
         public MasterComponent(ITheme theme) : base(theme)
         {
-            PrimaryNavigation = new PrimaryNavigationComponent(Theme);
-            SecondaryNavigation = new SecondaryNavigationComponent(Theme);
+            PrimaryNavigation = new NavigationComponent(Theme);
+            SecondaryNavigation = new NavigationComponent(Theme);
             Toolbar = new ToolbarComponent(Theme);
         }
 
@@ -35,7 +35,7 @@ namespace Xplorer.Components
             }
             
             Toolbar.Position(Console.WindowHeight - 1, 0, Console.WindowWidth, 1);
-            Toolbar.Render(Model.Toolbar);
+            Toolbar.Render();
         }
     }
 }
