@@ -1,11 +1,11 @@
 namespace Xplorer.Models
 {
-    public class NavigationEntryListItemModel
+    public class NavigationItemModel
     {
         public NavigationEntry Entry { get; }
         public bool IsActive { get; }
 
-        public NavigationEntryListItemModel(NavigationEntry entry, bool isActive)
+        public NavigationItemModel(NavigationEntry entry, bool isActive)
         {
             Entry = entry;
             IsActive = isActive;

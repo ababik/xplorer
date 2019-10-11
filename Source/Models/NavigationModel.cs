@@ -2,27 +2,29 @@ namespace Xplorer.Models
 {
     public class NavigationModel
     {
-        public string Message { get; }
         public string Location { get; }
+        public string Message { get; }
         public string Filter { get; }
         public bool IsActive { get; }
         public int ActiveIndex { get; }
+        public int FirstIndex { get; }
         public NavigationEntry ActiveEntry { get; }
         public NavigationEntry[] Entries { get; }
-        public NavigationEntryListModel VisibleEntryList { get; }
+        public NavigationItemModel[] VisibleItems { get; }
         public StatusbarModel Statusbar { get; }
         public ScrollbarModel Scrollbar { get; }
 
-        public NavigationModel(string message, string location, string filter, bool isActive, int activeIndex, NavigationEntry activeEntry, NavigationEntry[] entries, NavigationEntryListModel visibleEntryList, StatusbarModel statusbar, ScrollbarModel scrollbar)
+        public NavigationModel(string location, string message, string filter, bool isActive, int activeIndex, int firstIndex, NavigationEntry activeEntry, NavigationEntry[] entries, NavigationItemModel[] visibleItems, StatusbarModel statusbar, ScrollbarModel scrollbar)
         {
-            Message = message;
             Location = location;
+            Message = message;
             Filter = filter;
             IsActive = isActive;
             ActiveIndex = activeIndex;
+            FirstIndex = firstIndex;
             ActiveEntry = activeEntry;
             Entries = entries;
-            VisibleEntryList = visibleEntryList;
+            VisibleItems = visibleItems;
             Statusbar = statusbar;
             Scrollbar = scrollbar;
         }

@@ -3,19 +3,10 @@ using Xplorer.Models;
 
 namespace Xplorer.Components
 {
-    public class NavigationEntryListItemComponent : Component<NavigationEntryListItemModel>
+    public class NavigationItemComponent : Component<NavigationItemModel>
     {
-        public NavigationEntryListItemComponent(ITheme theme) : base(theme)
+        public NavigationItemComponent(ITheme theme) : base(theme)
         {
-        }
-
-        public override void Render(NavigationEntryListItemModel model)
-        {
-            if (Model?.Entry != model?.Entry || Model?.IsActive != model?.IsActive)
-            {
-                Model = model;
-                Render();
-            }
         }
 
         public override void Render()

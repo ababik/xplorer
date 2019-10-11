@@ -9,27 +9,30 @@ namespace Xplorer.Components
         {
         }
 
-        public override void Render(ScrollbarModel model)
-        {
-            if (Model?.GripEndPosition != model?.GripEndPosition || Model?.GripStartPosition != model?.GripStartPosition)
-            {
-                Model = model;
-                Render();
-            }
-        }
-        
         public override void Render()
         {
-            for (var i = 0; i < Height; i++)
+            if (Model.Visible)
             {
-                var index = i + Top;
-                var color = i >= Model.GripStartPosition && i < Model.GripEndPosition ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
-                Console.SetCursorPosition(Left, index);
-                Console.BackgroundColor = color;
-                Console.Write(" ");
-            }
+                for (var i = 0; i < Height; i++)
+                {
+                    var index = i + Top;
+                    var color = i >= Model.GripStartPosition && i < Model.GripEndPosition ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
+                    Console.SetCursorPosition(Left, index);
+                    Console.BackgroundColor = color;
+                    Console.Write(" ");
+                }
 
-            Console.ResetColor();
+                Console.ResetColor();
+            }
+            else
+            {
+                for (var i = 0; i < Height; i++)
+                {
+                    var index = i + Top;
+                    Console.SetCursorPosition(Left, index);
+                    Console.Write(" ");
+                }
+            }
         }
     }
 }

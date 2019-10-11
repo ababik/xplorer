@@ -7,6 +7,12 @@ namespace Xplorer.Components
     {
         public StatusbarComponent(ITheme theme) : base(theme)
         {
+            Application.OnResize += HandleResize;
+        }
+
+        private void HandleResize()
+        {
+            Model = null;
         }
 
         public override void Render()

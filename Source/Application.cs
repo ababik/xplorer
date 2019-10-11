@@ -12,6 +12,8 @@ namespace Xplorer
             application.Run();
         }
 
+        public static event Action OnResize;
+
         private Context Context { get; }
         private MasterComponent MasterComponent { get; }
 
@@ -35,6 +37,8 @@ namespace Xplorer
             Console.CursorVisible = false;
 
             var model = NavigationActions.CreateModel(Context);
+            var width = Console.WindowWidth;
+            var height = Console.WindowHeight;
 
             while (true)
             {
@@ -42,6 +46,18 @@ namespace Xplorer
                 Console.SetCursorPosition(0, 0);
 
                 var input = Console.ReadKey(true);
+
+                if (Console.WindowWidth != width || Console.WindowHeight != height)
+                {
+                    Console.Clear();
+                    Console.CursorVisible = false;
+
+                    width = Console.WindowWidth;
+                    height = Console.WindowHeight;
+                    
+                    OnResize?.Invoke();
+                    model = NavigationActions.Resize(Context, model);
+                }
 
                 if (input.Key == ConsoleKey.Spacebar)
                 {
