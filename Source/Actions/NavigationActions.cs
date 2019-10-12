@@ -21,13 +21,13 @@ namespace Xplorer.Actions
             }
             
             context.PrimaryFileSystem.Navigate(null);
-            context.SecondaryFileSystem.Navigate("C:\\");
+            context.SecondaryFileSystem.Navigate(null);
 
             var primaryNavigation = CreateNavigation(context.PrimaryFileSystem, true);
             var secondaryNavigation = CreateNavigation(context.SecondaryFileSystem, false);
             var toolbar = null as ToolbarModel;
 
-            return new MasterModel(primaryNavigation, secondaryNavigation, true, toolbar);
+            return new MasterModel(LayoutMode.PrimaryNavigation, primaryNavigation, secondaryNavigation, toolbar);
         }
 
         public static MasterModel Navigate(Context context, MasterModel model)
@@ -37,6 +37,16 @@ namespace Xplorer.Actions
             var entry = navigation.ActiveEntry;
             var location = navigation.Location;
             var activeIndex = 0;
+
+            if (entry.Type == NavigationEntryType.NavUpControl)
+            {
+                if (model.PrimaryNavigation.IsActive && model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation))
+                {
+                    var layoutMode = model.LayoutMode;
+                    layoutMode = layoutMode &= ~LayoutMode.SecondaryNavigation;
+                    model = model.Remute(x => x.LayoutMode, layoutMode);
+                }
+            }
             
             try
             {
@@ -168,7 +178,7 @@ namespace Xplorer.Actions
                 .Remute(x => x.ActiveIndex, 0)
                 .Remute(x => x.FirstIndex, 0)
                 .Remute(x => x.ActiveEntry, navigation.Entries[0])
-                .Remute(x => x.Entries, navigation.Entries);
+                .Remute(x => x.Entries, fileSystem.Entries);
             
             navigation = UpdateNavigation(navigation);
             
@@ -214,6 +224,13 @@ namespace Xplorer.Actions
 
         public static MasterModel ToggleActiveNavigation(Context context, MasterModel model)
         {
+            if (model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation) == false)
+            {   
+                var layoutMode = model.LayoutMode;
+                layoutMode = layoutMode |= LayoutMode.SecondaryNavigation;
+                model = model.Remute(x => x.LayoutMode, layoutMode);
+            }
+
             var isPrimaryActive = model.PrimaryNavigation.IsActive;
 
             model = model
@@ -249,7 +266,7 @@ namespace Xplorer.Actions
         }
 
         public static MasterModel Resize(Context context, MasterModel model)
-        {   
+        {
             var primaryNavigation = model.PrimaryNavigation.Remute(x => x.VisibleItems, null);
             primaryNavigation = UpdateNavigation(primaryNavigation);
 
@@ -259,7 +276,7 @@ namespace Xplorer.Actions
             model = model
                 .Remute(x => x.PrimaryNavigation, primaryNavigation)
                 .Remute(x => x.SecondaryNavigation, secondaryNavigation);
-
+ 
             return model;
         }
 

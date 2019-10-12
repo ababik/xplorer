@@ -28,7 +28,13 @@ namespace Xplorer.Components
                 SetCursorColor();
             }
 
-            Write(entry.Name, 2);
+            var name = entry.Name;
+            if (name.Length > Width - 2)
+            {
+                name = name.Remove(Width - 2 - 3) + "...";
+            }
+
+            Write(name, 2);
 
             if (Model.IsActive)
             {

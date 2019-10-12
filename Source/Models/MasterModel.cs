@@ -2,16 +2,16 @@ namespace Xplorer.Models
 {
     public class MasterModel
     {
+        public LayoutMode LayoutMode { get; }
         public NavigationModel PrimaryNavigation { get; }
         public NavigationModel SecondaryNavigation { get; }
         public ToolbarModel Toolbar { get; }
-        public bool SecondaryNavigationVisible { get; }
 
-        public MasterModel(NavigationModel primaryNavigation, NavigationModel secondaryNavigation, bool secondaryNavigationVisible, ToolbarModel toolbar)
+        public MasterModel(LayoutMode layoutMode, NavigationModel primaryNavigation, NavigationModel secondaryNavigation, ToolbarModel toolbar)
         {
+            LayoutMode = layoutMode;
             PrimaryNavigation = primaryNavigation;
             SecondaryNavigation = secondaryNavigation;
-            SecondaryNavigationVisible = secondaryNavigationVisible;
             Toolbar = toolbar;
         }
     }
