@@ -88,9 +88,13 @@ namespace Xplorer
                     case ConsoleKey.Backspace:
                         model = NavigationActions.Back(Context, model);
                         break;
-                    case ConsoleKey.Tab:
-                        model = NavigationActions.ToggleActiveNavigation(Context, model);
-                        break;
+                }
+
+                switch (input.KeyChar)
+                {
+                    case ']': model = NavigationActions.ToggleSecondaryNavigation(Context, model); break;
+                    case '[': model = NavigationActions.TogglePrimaryNavigation(Context, model); break;
+                    case '/': model = NavigationActions.SelectActiveItem(Context, model); break;
                 }
 
                 if (char.IsLetterOrDigit(input.KeyChar))

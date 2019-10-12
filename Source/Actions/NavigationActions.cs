@@ -37,16 +37,6 @@ namespace Xplorer.Actions
             var entry = navigation.ActiveEntry;
             var location = navigation.Location;
             var activeIndex = 0;
-
-            if (entry.Type == NavigationEntryType.NavUpControl)
-            {
-                if (model.PrimaryNavigation.IsActive && model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation))
-                {
-                    var layoutMode = model.LayoutMode;
-                    layoutMode = layoutMode &= ~LayoutMode.SecondaryNavigation;
-                    model = model.Remute(x => x.LayoutMode, layoutMode);
-                }
-            }
             
             try
             {
@@ -222,22 +212,43 @@ namespace Xplorer.Actions
             return model;
         }
 
-        public static MasterModel ToggleActiveNavigation(Context context, MasterModel model)
+        public static MasterModel ToggleSecondaryNavigation(Context context, MasterModel model)
         {
-            if (model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation) == false)
-            {   
-                var layoutMode = model.LayoutMode;
-                layoutMode = layoutMode |= LayoutMode.SecondaryNavigation;
+            if (model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation))
+            {
+                if (model.SecondaryNavigation.IsActive)
+                {
+                    var layoutMode = model.LayoutMode.UnsetFlag<LayoutMode>(LayoutMode.SecondaryNavigation);
+                    model = model.Remute(x => x.LayoutMode, layoutMode);
+                    model = ToggleActiveNavigation(model, true);
+                }
+                else
+                {
+                    model = ToggleActiveNavigation(model, false);
+                }
+            }
+            else
+            {
+                var layoutMode = model.LayoutMode.ToggleFlag<LayoutMode>(LayoutMode.SecondaryNavigation);
                 model = model.Remute(x => x.LayoutMode, layoutMode);
+                model = ToggleActiveNavigation(model, false);
             }
 
-            var isPrimaryActive = model.PrimaryNavigation.IsActive;
+            return model;
+        }
 
+        public static MasterModel TogglePrimaryNavigation(Context context, MasterModel model)
+        {
+            return ToggleActiveNavigation(model, true);
+        }
+
+        private static MasterModel ToggleActiveNavigation(MasterModel model, bool isPrimaryActive)
+        {
             model = model
-                .Remute(x => x.PrimaryNavigation.IsActive, !isPrimaryActive)
-                .Remute(x => x.PrimaryNavigation.Scrollbar.Visible, !isPrimaryActive)
-                .Remute(x => x.SecondaryNavigation.IsActive, isPrimaryActive)
-                .Remute(x => x.SecondaryNavigation.Scrollbar.Visible, isPrimaryActive);
+                .Remute(x => x.PrimaryNavigation.IsActive, isPrimaryActive)
+                .Remute(x => x.PrimaryNavigation.Scrollbar.Visible, isPrimaryActive)
+                .Remute(x => x.SecondaryNavigation.IsActive, !isPrimaryActive)
+                .Remute(x => x.SecondaryNavigation.Scrollbar.Visible, !isPrimaryActive);
 
             var primaryNavigation = UpdateNavigation(model.PrimaryNavigation);
             var secondaryNavigation = UpdateNavigation(model.SecondaryNavigation);
@@ -245,6 +256,13 @@ namespace Xplorer.Actions
             model = model
                 .Remute(x => x.PrimaryNavigation, primaryNavigation)
                 .Remute(x => x.SecondaryNavigation, secondaryNavigation);
+
+            return model;
+        }
+
+        public static MasterModel SelectActiveItem(Context context, MasterModel model)
+        {
+            
 
             return model;
         }
