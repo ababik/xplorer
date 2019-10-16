@@ -94,7 +94,7 @@ namespace Xplorer
                 {
                     case ']': model = NavigationActions.ToggleSecondaryNavigation(Context, model); break;
                     case '[': model = NavigationActions.TogglePrimaryNavigation(Context, model); break;
-                    case '/': model = NavigationActions.SelectActiveItem(Context, model); break;
+                    case '/': model = NavigationActions.ToggleSelectedItem(Context, model); break;
                 }
 
                 if (char.IsLetterOrDigit(input.KeyChar))

@@ -28,6 +28,11 @@ namespace Xplorer.Components
                 SetCursorColor();
             }
 
+            if (Model.IsSelected)
+            {
+                Console.ForegroundColor = Theme.GetSelectedEntryColor();
+            }
+
             var name = entry.Name;
             if (name.Length > Width - 2)
             {
@@ -36,7 +41,7 @@ namespace Xplorer.Components
 
             Write(name, 2);
 
-            if (Model.IsActive)
+            if (Model.IsActive || Model.IsSelected)
             {
                 ResetCursorColor();
             }

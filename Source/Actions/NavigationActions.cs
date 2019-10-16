@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Remutable.Extensions;
@@ -15,7 +16,7 @@ namespace Xplorer.Actions
                 var activeEntry = fileSystem.Entries[0];
                 var statusbar = new StatusbarModel(null);
                 var scrollbar = new ScrollbarModel(isActive, 0, 0);
-                var navigation = new NavigationModel(fileSystem.Location, string.Empty, string.Empty, isActive, 0, 0, activeEntry, fileSystem.Entries, null, statusbar, scrollbar);
+                var navigation = new NavigationModel(fileSystem.Location, string.Empty, string.Empty, isActive, 0, 0, activeEntry, new HashSet<NavigationEntry>(), fileSystem.Entries, null, statusbar, scrollbar);
                 navigation = UpdateNavigation(navigation);
                 return navigation;
             }
@@ -64,6 +65,8 @@ namespace Xplorer.Actions
                 }
             }
 
+            navigation.SelectedEntries.Clear();
+
             navigation = navigation
                 .Remute(x => x.Location, fileSystem.Location)
                 .Remute(x => x.Message, string.Empty)
@@ -71,7 +74,7 @@ namespace Xplorer.Actions
                 .Remute(x => x.ActiveIndex, activeIndex)
                 .Remute(x => x.FirstIndex, 0)
                 .Remute(x => x.ActiveEntry, fileSystem.Entries[activeIndex])
-                .Remute(x => x.Entries, fileSystem.Entries);
+                .Remute(x => x.ContentEntries, fileSystem.Entries);
             
             navigation = UpdateNavigation(navigation);
             
@@ -82,7 +85,7 @@ namespace Xplorer.Actions
         {
             GetActive(context, model, out var fileSystem, out var navigation);
 
-            if (navigation.ActiveIndex == navigation.Entries.Length - 1)
+            if (navigation.ActiveIndex == navigation.ContentEntries.Length - 1)
             {
                 return model;
             }
@@ -122,7 +125,7 @@ namespace Xplorer.Actions
         {
             GetActive(context, model, out var fileSystem, out var navigation);
 
-            var activeIndex = navigation.Entries.Length == 0 ? 0 : navigation.Entries.Length - 1;
+            var activeIndex = navigation.ContentEntries.Length == 0 ? 0 : navigation.ContentEntries.Length - 1;
             navigation = Cursor(navigation, activeIndex);
 
             return SetActiveNavigation(model, navigation);
@@ -167,8 +170,8 @@ namespace Xplorer.Actions
                 .Remute(x => x.Filter, string.Empty)
                 .Remute(x => x.ActiveIndex, 0)
                 .Remute(x => x.FirstIndex, 0)
-                .Remute(x => x.ActiveEntry, navigation.Entries[0])
-                .Remute(x => x.Entries, fileSystem.Entries);
+                .Remute(x => x.ActiveEntry, navigation.ContentEntries[0])
+                .Remute(x => x.ContentEntries, fileSystem.Entries);
             
             navigation = UpdateNavigation(navigation);
             
@@ -260,9 +263,25 @@ namespace Xplorer.Actions
             return model;
         }
 
-        public static MasterModel SelectActiveItem(Context context, MasterModel model)
+        public static MasterModel ToggleSelectedItem(Context context, MasterModel model)
         {
-            
+            var navigation = GetActiveNavigation(model);
+
+            if (navigation.ActiveEntry.Type == NavigationEntryType.NavUpControl)
+            {
+                return model;
+            }
+
+            if (navigation.SelectedEntries.Contains(navigation.ActiveEntry))
+            {
+                navigation.SelectedEntries.Remove(navigation.ActiveEntry);
+            }
+            else
+            {
+                navigation.SelectedEntries.Add(navigation.ActiveEntry);
+            }
+
+            model = MoveDown(context, model);
 
             return model;
         }
@@ -316,7 +335,7 @@ namespace Xplorer.Actions
             navigation = navigation
                 .Remute(x => x.Message, string.Empty)
                 .Remute(x => x.ActiveIndex, activeIndex)
-                .Remute(x => x.ActiveEntry, navigation.Entries[activeIndex]);
+                .Remute(x => x.ActiveEntry, navigation.ContentEntries[activeIndex]);
             navigation = UpdateNavigation(navigation);
             return navigation;
         }
@@ -333,7 +352,7 @@ namespace Xplorer.Actions
                 .Remute(x => x.Filter, filter)
                 .Remute(x => x.ActiveIndex, activeIndex)
                 .Remute(x => x.ActiveEntry, entries[activeIndex])
-                .Remute(x => x.Entries, entries);
+                .Remute(x => x.ContentEntries, entries);
 
             navigation = UpdateNavigation(navigation);
             
@@ -397,7 +416,7 @@ namespace Xplorer.Actions
             var height = Layout.GetNavigationEntryListHeight();
             var activeIndex = navigation.ActiveIndex;
             var firstIndex = navigation.FirstIndex;
-            var entries = navigation.Entries;
+            var entries = navigation.ContentEntries;
 
             var lastIndex = firstIndex + height - 1;
 
@@ -440,6 +459,7 @@ namespace Xplorer.Actions
             {
                 var entry = i < visibleEntries.Length ? visibleEntries[i] : null;
                 var isActive = navigation.IsActive && entry == navigation.ActiveEntry;
+                var isSelected = navigation.SelectedEntries.Contains(entry);
                 
                 if (entry == null)
                 {
@@ -449,13 +469,14 @@ namespace Xplorer.Actions
 
                 if (prevItems[i] == null)
                 {
-                    nextItems[i] = new NavigationItemModel(entry, isActive);
+                    nextItems[i] = new NavigationItemModel(entry, isActive, isSelected);
                     continue;
                 }
 
                 nextItems[i] = prevItems[i]
                     .Remute(x => x.Entry, entry)
-                    .Remute(x => x.IsActive, isActive);
+                    .Remute(x => x.IsActive, isActive)
+                    .Remute(x => x.IsSelected, isSelected);
             }
             
             navigation = navigation
@@ -468,7 +489,7 @@ namespace Xplorer.Actions
         private static NavigationModel UpdateScrollbar(NavigationModel navigation)
         {
             var firstIndex = navigation.FirstIndex;
-            var contentSize = navigation.Entries.Length;
+            var contentSize = navigation.ContentEntries.Length;
             var windowSize = navigation.VisibleItems.Length;
 
             var trackSize = windowSize;

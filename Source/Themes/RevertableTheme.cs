@@ -50,6 +50,11 @@ namespace Xplorer.Themes
             return ConsoleColor.Gray;
         }
 
+        public ConsoleColor GetSelectedEntryColor()
+        {
+            return ConsoleColor.Yellow;
+        }
+
         public ConsoleColor GetScrollBackgroundColor()
         {
             return ConsoleColor.Gray;
