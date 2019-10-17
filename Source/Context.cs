@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using Xplorer.FileSystems;
+using Xplorer.Models;
 using Xplorer.OperationSystems;
+using Xplorer.States;
 using Xplorer.Themes;
 
 namespace Xplorer
@@ -12,6 +14,7 @@ namespace Xplorer
         public IOperationSystem OperationSystem { get; }
         public ITheme Theme { get; }
         private OSPlatform Platform { get; }
+        public Model Model { get; set; }
 
         public Context()
         {

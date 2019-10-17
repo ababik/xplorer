@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Xplorer
+namespace Xplorer.Models
 {
     public class NavigationEntry
     {

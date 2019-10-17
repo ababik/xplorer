@@ -1,9 +1,10 @@
 using System;
 using Xplorer.Models;
+using Xplorer.States;
 
 namespace Xplorer.Components
 {
-    public class NavigationItemComponent : Component<NavigationItemModel>
+    public class NavigationItemComponent : Component<NavigationItemState>
     {
         public NavigationItemComponent(ITheme theme) : base(theme)
         {
@@ -13,22 +14,22 @@ namespace Xplorer.Components
         {
             Console.SetCursorPosition(Left, Top);
             
-            if (Model == null)
+            if (State == null)
             {
                 Write(null);
                 return;
             }
 
-            var entry = Model.Entry;
+            var entry = State.Entry;
 
             RenderMarker(entry);
 
-            if (Model.IsActive)
+            if (State.IsActive)
             {
                 SetCursorColor();
             }
 
-            if (Model.IsSelected)
+            if (State.IsSelected)
             {
                 Console.ForegroundColor = Theme.GetSelectedEntryColor();
             }
@@ -41,7 +42,7 @@ namespace Xplorer.Components
 
             Write(name, 2);
 
-            if (Model.IsActive || Model.IsSelected)
+            if (State.IsActive || State.IsSelected)
             {
                 ResetCursorColor();
             }

@@ -5,7 +5,7 @@ namespace Xplorer.OperationSystems
 {
     internal class OsxOperationSystem : IOperationSystem
     {
-        public void Reveal(NavigationModel navigation)
+        public void Reveal(Navigation navigation)
         {
             var location = NavigationActions.GetActiveLocation(navigation);
             var argument = "/";

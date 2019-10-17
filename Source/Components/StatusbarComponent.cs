@@ -1,10 +1,12 @@
 using System;
-using Xplorer.Models;
+using Xplorer.States;
 
 namespace Xplorer.Components
 {
-    public class StatusbarComponent : Component<StatusbarModel>
+    public class StatusbarComponent : Component<StatusbarState>
     {
+        public static int Height => 1;
+
         public StatusbarComponent(ITheme theme) : base(theme)
         {
             Application.OnResize += HandleResize;
@@ -12,13 +14,13 @@ namespace Xplorer.Components
 
         private void HandleResize()
         {
-            Model = null;
+            State = null;
         }
 
         public override void Render()
         {
             Console.SetCursorPosition(Left, Top);
-            Write(Model.Status);
+            Write(State.Status);
         }
     }
 }

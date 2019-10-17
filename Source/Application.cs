@@ -36,13 +36,13 @@ namespace Xplorer
             Console.Clear();
             Console.CursorVisible = false;
 
-            var model = NavigationActions.CreateModel(Context);
+            var state = NavigationActions.Init(Context);
             var width = Console.WindowWidth;
             var height = Console.WindowHeight;
 
             while (true)
             {
-                MasterComponent.Render(model);
+                MasterComponent.Render(state);
                 Console.SetCursorPosition(0, 0);
 
                 var input = Console.ReadKey(true);
@@ -56,50 +56,51 @@ namespace Xplorer
                     height = Console.WindowHeight;
                     
                     OnResize?.Invoke();
-                    model = NavigationActions.Resize(Context, model);
+                    state = NavigationActions.Resize(Context, state);
                 }
 
                 if (input.Key == ConsoleKey.Spacebar)
                 {
-                    model = NavigationActions.Reveal(Context, model);
+                    state = NavigationActions.Reveal(Context, state);
                     continue;
                 }
 
                 switch (input.Key)
                 {
                     case ConsoleKey.DownArrow: 
-                        model = NavigationActions.MoveDown(Context, model);
+                        state = NavigationActions.MoveDown(Context, state);
                         break;
                     case ConsoleKey.UpArrow: 
-                        model = NavigationActions.MoveUp(Context, model);
+                        state = NavigationActions.MoveUp(Context, state);
                         break;
                     case ConsoleKey.LeftArrow: 
-                        model = NavigationActions.MoveLeft(Context, model);
+                        state = NavigationActions.MoveLeft(Context, state);
                         break;
                     case ConsoleKey.RightArrow:
-                        model = NavigationActions.MoveRight(Context, model);
+                        state = NavigationActions.MoveRight(Context, state);
                         break;
                     case ConsoleKey.Enter: 
-                        model = NavigationActions.Navigate(Context, model);
+                        state = NavigationActions.Navigate(Context, state);
                         break;
                     case ConsoleKey.Escape:
-                        model = NavigationActions.Escape(Context, model);
+                        state = NavigationActions.Escape(Context, state);
                         break;
                     case ConsoleKey.Backspace:
-                        model = NavigationActions.Back(Context, model);
+                        state = NavigationActions.Back(Context, state);
                         break;
                 }
 
                 switch (input.KeyChar)
                 {
-                    case ']': model = NavigationActions.ToggleSecondaryNavigation(Context, model); break;
-                    case '[': model = NavigationActions.TogglePrimaryNavigation(Context, model); break;
-                    case '/': model = NavigationActions.ToggleSelectedItem(Context, model); break;
+                    case ']': state = NavigationActions.ToggleSecondaryNavigation(Context, state); break;
+                    case '[': state = NavigationActions.TogglePrimaryNavigation(Context, state); break;
+                    case '/': state = NavigationActions.ToggleSelectedItem(Context, state); break;
+                    case '?': state = NavigationActions.RevertSelectedItems(Context, state); break;
                 }
 
                 if (char.IsLetterOrDigit(input.KeyChar))
                 {
-                    model = NavigationActions.ApplyFilter(Context, model, input.KeyChar);
+                    state = NavigationActions.ApplyFilter(Context, state, input.KeyChar);
                 }
             }
         }

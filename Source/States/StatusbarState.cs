@@ -1,10 +1,10 @@
-namespace Xplorer.Models
+namespace Xplorer.States
 {
-    public class StatusbarModel
+    public class StatusbarState
     {
         public string Status { get; }
         
-        public StatusbarModel(string status)
+        public StatusbarState(string status)
         {
             Status = status;
         }

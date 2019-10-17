@@ -2,7 +2,7 @@ using System;
 
 namespace Xplorer
 {
-    public abstract class Component<TModel>
+    public abstract class Component<TState>
     {
         public int Top { get; set; }
         public int Left { get; set; }
@@ -13,7 +13,7 @@ namespace Xplorer
         private int PrevWidth { get; set; }
         private int PrevHeight { get; set; }
         protected ITheme Theme { get; }
-        protected TModel Model { get; set; }
+        protected TState State { get; set; }
 
         public Component(ITheme theme)
         {
@@ -22,11 +22,11 @@ namespace Xplorer
 
         public abstract void Render();
 
-        public virtual void Render(TModel model)
+        public virtual void Render(TState state)
         {
-            if ((object.Equals(model, Model) == false) ||  (Top != PrevTop) || (Left != PrevLeft) || (Width != PrevWidth || (Height != PrevHeight)))
+            if ((object.Equals(state, State) == false) ||  (Top != PrevTop) || (Left != PrevLeft) || (Width != PrevWidth || (Height != PrevHeight)))
             {
-                Model = model;
+                State = state;
                 
                 PrevTop = Top;
                 PrevLeft = Left;

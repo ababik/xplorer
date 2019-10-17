@@ -1,9 +1,9 @@
 using System;
-using Xplorer.Models;
+using Xplorer.States;
 
 namespace Xplorer.Components
 {
-    public class ScrollbarComponent : Component<ScrollbarModel>
+    public class ScrollbarComponent : Component<ScrollbarState>
     {
         public ScrollbarComponent(ITheme theme) : base(theme)
         {
@@ -11,12 +11,12 @@ namespace Xplorer.Components
 
         public override void Render()
         {
-            if (Model.Visible)
+            if (State.Visible)
             {
                 for (var i = 0; i < Height; i++)
                 {
                     var index = i + Top;
-                    var color = i >= Model.GripStartPosition && i < Model.GripEndPosition ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
+                    var color = i >= State.GripStartPosition && i < State.GripEndPosition ? Theme.GetScrollGripColor() : Theme.GetScrollBackgroundColor();
                     Console.SetCursorPosition(Left, index);
                     Console.BackgroundColor = color;
                     Console.Write(" ");

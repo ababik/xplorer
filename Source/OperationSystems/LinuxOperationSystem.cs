@@ -4,7 +4,7 @@ namespace Xplorer.OperationSystems
 {
     internal class LinuxOperationSystem : IOperationSystem
     {
-        public void Reveal(NavigationModel navigation)
+        public void Reveal(Navigation navigation)
         {
         }
     }

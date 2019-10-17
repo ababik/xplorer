@@ -5,7 +5,7 @@ namespace Xplorer.OperationSystems
 {
     internal class WindowsOperationSystem : IOperationSystem
     {
-        public void Reveal(NavigationModel navigation)
+        public void Reveal(Navigation navigation)
         {
             var location = NavigationActions.GetActiveLocation(navigation);
             var argument = string.Empty;

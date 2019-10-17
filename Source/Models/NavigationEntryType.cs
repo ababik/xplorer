@@ -1,4 +1,4 @@
-namespace Xplorer
+namespace Xplorer.Models
 {
     public enum NavigationEntryType
     {

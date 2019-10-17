@@ -4,6 +4,6 @@ namespace Xplorer
 {
     public interface IOperationSystem
     {
-        void Reveal(NavigationModel navigation);
+        void Reveal(Navigation navigation);
     }
 }

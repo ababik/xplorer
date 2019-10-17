@@ -1,3 +1,5 @@
+using Xplorer.Models;
+
 namespace Xplorer
 {
     public interface IFileSystem

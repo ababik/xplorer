@@ -1,12 +1,12 @@
-namespace Xplorer.Models
+namespace Xplorer.States
 {
-    public class ScrollbarModel
+    public class ScrollbarState
     {
         public bool Visible { get; }
         public int GripStartPosition { get; }
         public int GripEndPosition { get; }
 
-        public ScrollbarModel(bool visible, int gripStartPosition, int gripEndPosition)
+        public ScrollbarState(bool visible, int gripStartPosition, int gripEndPosition)
         {
             Visible = visible;
             GripStartPosition = gripStartPosition;

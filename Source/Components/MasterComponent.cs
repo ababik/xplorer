@@ -1,9 +1,9 @@
 using System;
-using Xplorer.Models;
+using Xplorer.States;
 
 namespace Xplorer.Components
 {
-    public class MasterComponent : Component<MasterModel>
+    public class MasterComponent : Component<MasterState>
     {
         private NavigationComponent PrimaryNavigation { get; set; }
         private NavigationComponent SecondaryNavigation { get; set; }
@@ -16,7 +16,7 @@ namespace Xplorer.Components
 
         public override void Render()
         {
-            if (Model.LayoutMode.HasFlag(LayoutMode.PrimaryNavigation))
+            if (State.PrimaryNavigation != null)
             {
                 PrimaryNavigation = PrimaryNavigation ?? new NavigationComponent(Theme);
             }
@@ -25,7 +25,7 @@ namespace Xplorer.Components
                 PrimaryNavigation = null;
             }
 
-            if (Model.LayoutMode.HasFlag(LayoutMode.SecondaryNavigation))
+            if (State.SecondaryNavigation != null)
             {
                 SecondaryNavigation = SecondaryNavigation ?? new NavigationComponent(Theme);
             }
@@ -42,9 +42,9 @@ namespace Xplorer.Components
             }
             
             PrimaryNavigation?.Position(0, 0, primaryNavigationWidth, Console.WindowHeight - 1);
-            PrimaryNavigation?.Render(Model.PrimaryNavigation);
+            PrimaryNavigation?.Render(State.PrimaryNavigation);
             SecondaryNavigation?.Position(0, primaryNavigationWidth, Console.WindowWidth - primaryNavigationWidth, Console.WindowHeight - 1);
-            SecondaryNavigation?.Render(Model.SecondaryNavigation);
+            SecondaryNavigation?.Render(State.SecondaryNavigation);
             
             Toolbar.Position(Console.WindowHeight - 1, 0, Console.WindowWidth - 1, 1);
             Toolbar.Render();
