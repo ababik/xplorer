@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -68,6 +69,106 @@ namespace Xplorer.FileSystems
 
             Location = location;
             Entries = entries;
+        }
+
+        public bool CheckCopy(NavigationEntry[] entries, string destination, out long size)
+        {
+            var bytes = 0L;
+            var result = false;
+
+            void ProcessFile(FileInfo file)
+            {
+                bytes += file.Length;
+
+                var destinationPath = RemapDestinationPath(file.FullName, Location, destination);
+
+                if (result == false && File.Exists(destinationPath))
+                {
+                    result = true;
+                }
+            }
+
+            void ProcessDirectory(DirectoryInfo directory)
+            {
+                var destinationPath = RemapDestinationPath(directory.FullName, Location, destination);
+
+                if (result == false && Directory.Exists(destinationPath))
+                {
+                    result = true;
+                }
+            }
+
+            Convert(entries, out var files, out var directories);
+            Recursion(files, directories, ProcessFile, ProcessDirectory);
+
+            size = bytes;
+            return result;
+        }
+
+        public void Copy(NavigationEntry[] entries, string destination, bool overwrite)
+        {
+            void ProcessFile(FileInfo file)
+            {
+                var destinationPath = RemapDestinationPath(file.FullName, Location, destination);
+
+                if (File.Exists(destinationPath) && overwrite == false)
+                {
+                    return;
+                }
+
+                var destinationDirectory = Path.GetDirectoryName(destinationPath);
+
+                if (Directory.Exists(destinationDirectory) == false)
+                {
+                    Directory.CreateDirectory(destinationDirectory);
+                }
+
+                file.CopyTo(destinationPath, true);
+            }
+
+            void ProcessDirectory(DirectoryInfo directory)
+            {
+                var destinationPath = RemapDestinationPath(directory.FullName, Location, destination);
+
+                Directory.CreateDirectory(destinationPath);
+            }
+
+            Convert(entries, out var files, out var directories);
+            Recursion(files, directories, ProcessFile, ProcessDirectory);
+        }
+
+        private void Convert(NavigationEntry[] entries, out FileInfo[] files, out DirectoryInfo[] directories)
+        {
+            files = entries
+                .Where(x => x.Type == NavigationEntryType.File)
+                .Select(x => new FileInfo(Path.Combine(Location, x.Name)))
+                .ToArray();
+
+            directories = entries
+                .Where(x => x.Type == NavigationEntryType.Directory)
+                .Select(x => new DirectoryInfo(Path.Combine(Location, x.Name)))
+                .ToArray();
+        }
+
+        private static void Recursion(FileInfo[] files, DirectoryInfo[] directories, Action<FileInfo> processFileCallback, Action<DirectoryInfo> processDirectoryCallback)
+        {
+            foreach (var file in files)
+            {
+                processFileCallback.Invoke(file);
+            }
+
+            foreach (var directory in directories)
+            {
+                processDirectoryCallback.Invoke(directory);
+                Recursion(directory.GetFiles(), directory.GetDirectories(), processFileCallback, processDirectoryCallback);
+            }
+        }
+
+        private static string RemapDestinationPath(string path, string source, string destination)
+        {
+            var relativePath = Path.GetRelativePath(source, path);
+            var destinationPath = Path.Combine(destination, relativePath);
+            return destinationPath;
         }
 
         private static void ExecuteFile(string path)

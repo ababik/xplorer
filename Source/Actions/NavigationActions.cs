@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Remutable.Extensions;
 using Xplorer.Models;
 using Xplorer.States;
@@ -30,13 +31,11 @@ namespace Xplorer.Actions
 
             static NavigationState CreateNavigationState(IFileSystem fileSystem, Navigation navigation, bool isActive)
             {
-                var statusbar = new StatusbarState(null);
-                var scrollbar = new ScrollbarState(isActive, 0, 0);
-                var state = new NavigationState(null, statusbar, scrollbar);
+                var state = CreateDefaultNavigationState(isActive);
                 state = UpdateNavigation(navigation, state);
                 return state;
             }
-            
+
             context.PrimaryFileSystem.Navigate(null);
             context.SecondaryFileSystem.Navigate(null);
 
@@ -47,9 +46,42 @@ namespace Xplorer.Actions
 
             var primaryNavigation = CreateNavigationState(context.PrimaryFileSystem, context.Model.PrimaryNavigation, true);
             var secondaryNavigation = null as NavigationState;
-            var toolbar = null as ToolbarState;
+            var toolbar = CreateDefaultToolbarState();
 
             return new MasterState(primaryNavigation, secondaryNavigation, toolbar);
+        }
+
+        public static MasterState RefreshNavigations(Context context, MasterState state)
+        {
+            NavigationState Refresh(IFileSystem fileSystem, Navigation navigation, NavigationState navigationState)
+            {
+                fileSystem.Navigate(fileSystem.Location);
+                var entries = fileSystem.Entries;
+                if (navigation.Filter != string.Empty)
+                {
+                    entries = entries
+                        .Where(x => x.Name.Contains(navigation.Filter, StringComparison.OrdinalIgnoreCase) || x.Type == NavigationEntryType.NavUpControl)
+                        .ToArray();
+                }
+
+                navigation.ContentEntries = entries;
+                if (navigation.ActiveIndex >= navigation.ContentEntries.Length)
+                {
+                    navigation.ActiveIndex = 0;
+                    navigation.ActiveEntry = navigation.ContentEntries[navigation.ActiveIndex];
+                }
+                navigationState = UpdateNavigation(navigation, navigationState);
+                return navigationState;
+            }
+
+            var primaryNavigationState = Refresh(context.PrimaryFileSystem, context.Model.PrimaryNavigation, state.PrimaryNavigation);
+            var secondaryNavigationState = Refresh(context.SecondaryFileSystem, context.Model.SecondaryNavigation, state.SecondaryNavigation);
+
+            state = state
+                .Remute(x => x.PrimaryNavigation, primaryNavigationState)
+                .Remute(x => x.SecondaryNavigation, secondaryNavigationState);
+            
+            return state;
         }
 
         public static MasterState Navigate(Context context, MasterState state)
@@ -59,7 +91,7 @@ namespace Xplorer.Actions
             var entry = navigation.ActiveEntry;
             var location = navigation.Location;
             var activeIndex = 0;
-            
+
             try
             {
                 fileSystem.Navigate(entry.Type == NavigationEntryType.NavUpControl ? null : entry.Name);
@@ -94,9 +126,9 @@ namespace Xplorer.Actions
             navigation.ActiveEntry = fileSystem.Entries[activeIndex];
             navigation.SelectedEntries.Clear();
             navigation.ContentEntries = fileSystem.Entries;
-            
+
             navigationState = UpdateNavigation(navigation, navigationState);
-            
+
             return SetActiveNavigationState(context, state, navigationState);
         }
 
@@ -111,7 +143,7 @@ namespace Xplorer.Actions
 
             var activeIndex = navigation.ActiveIndex + 1;
             navigationState = Cursor(navigation, navigationState, activeIndex);
-            
+
             return SetActiveNavigationState(context, state, navigationState);
         }
 
@@ -154,6 +186,11 @@ namespace Xplorer.Actions
         {
             GetActive(context, state, out var fileSystem, out var navigation, out var navigationState);
 
+            if (fileSystem.Location == null)
+            {
+                return state;
+            }
+
             var filter = navigation.Filter + value;
             navigationState = Filter(navigation, navigationState, fileSystem, filter);
 
@@ -190,9 +227,9 @@ namespace Xplorer.Actions
             navigation.FirstIndex = 0;
             navigation.ActiveEntry = navigation.ContentEntries[0];
             navigation.ContentEntries = fileSystem.Entries;
-            
+
             navigationState = UpdateNavigation(navigation, navigationState);
-            
+
             return SetActiveNavigationState(context, state, navigationState);
         }
 
@@ -227,7 +264,7 @@ namespace Xplorer.Actions
         public static MasterState Reveal(Context context, MasterState state)
         {
             var navigation = GetActiveNavigation(context);
-            
+
             context.OperationSystem.Reveal(navigation);
 
             return state;
@@ -253,8 +290,18 @@ namespace Xplorer.Actions
         {
             GetActive(context, state, out var fileSystem, out var navigation, out var navigationState);
 
+            if (navigation.Location == null)
+            {
+                return state;
+            }
+
             foreach (var entry in navigation.ContentEntries)
             {
+                if (entry.Type == NavigationEntryType.NavUpControl)
+                {
+                    continue;
+                }
+
                 if (navigation.SelectedEntries.Contains(entry))
                 {
                     navigation.SelectedEntries.Remove(entry);
@@ -274,7 +321,12 @@ namespace Xplorer.Actions
 
         public static MasterState ToggleSelectedItem(Context context, MasterState state)
         {
-            var navigation = GetActiveNavigation(context);
+            GetActive(context, state, out var fileSystem, out var navigation, out var navigationState);
+
+            if (navigation.Location == null)
+            {
+                return state;
+            }
 
             if (navigation.ActiveEntry.Type == NavigationEntryType.NavUpControl)
             {
@@ -291,7 +343,15 @@ namespace Xplorer.Actions
                 navigation.SelectedEntries.Add(navigation.ActiveEntry);
             }
 
-            state = MoveDown(context, state);
+            if (navigation.ActiveIndex == navigation.ContentEntries.Length - 1)
+            {
+                navigationState = UpdateItems(navigation, navigationState);
+                state = SetActiveNavigationState(context, state, navigationState);
+            }
+            else
+            {
+                state = MoveDown(context, state);
+            }
 
             return state;
         }
@@ -334,9 +394,7 @@ namespace Xplorer.Actions
 
             if (context.Model.Layout.HasFlag(Layout.SecondaryNavigation))
             {
-                var statusbar = new StatusbarState(null);
-                var scrollbar = new ScrollbarState(false, 0, 0);
-                secondaryNavigation = new NavigationState(null, statusbar, scrollbar);
+                secondaryNavigation = CreateDefaultNavigationState(false);
                 secondaryNavigation = UpdateNavigation(context.Model.SecondaryNavigation, secondaryNavigation);
             }
 
@@ -346,7 +404,7 @@ namespace Xplorer.Actions
 
             state = state
                 .Remute(x => x.PrimaryNavigation.Scrollbar.Visible, isPrimaryActive);
-            
+
             if (state.SecondaryNavigation != null)
             {
                 state = state
@@ -367,7 +425,7 @@ namespace Xplorer.Actions
             state = state
                 .Remute(x => x.PrimaryNavigation, primaryNavigation)
                 .Remute(x => x.SecondaryNavigation, secondaryNavigation);
- 
+
             return state;
         }
 
@@ -382,7 +440,7 @@ namespace Xplorer.Actions
             return state;
         }
 
-        private static void GetActive(Context context, MasterState state, out IFileSystem fileSystem, out Navigation navigation, out NavigationState navigationState)
+        public static void GetActive(Context context, MasterState state, out IFileSystem fileSystem, out Navigation navigation, out NavigationState navigationState)
         {
             var model = context.Model;
             fileSystem = GetActiveFileSystem(context);
@@ -390,28 +448,28 @@ namespace Xplorer.Actions
             navigationState = GetActiveNavigationState(context, state);
         }
 
-        private static IFileSystem GetActiveFileSystem(Context context)
+        public static IFileSystem GetActiveFileSystem(Context context)
         {
             return context.Model.PrimaryNavigation.IsActive
                 ? context.PrimaryFileSystem
                 : context.SecondaryFileSystem;
         }
 
-        private static Navigation GetActiveNavigation(Context context)
+        public static Navigation GetActiveNavigation(Context context)
         {
             return context.Model.PrimaryNavigation.IsActive
                 ? context.Model.PrimaryNavigation
                 : context.Model.SecondaryNavigation;
         }
 
-        private static NavigationState GetActiveNavigationState(Context context, MasterState state)
+        public static NavigationState GetActiveNavigationState(Context context, MasterState state)
         {
             return context.Model.PrimaryNavigation.IsActive
                 ? state.PrimaryNavigation
                 : state.SecondaryNavigation;
         }
 
-        private static MasterState SetActiveNavigationState(Context context, MasterState masterState, NavigationState navigationState)
+        public static MasterState SetActiveNavigationState(Context context, MasterState masterState, NavigationState navigationState)
         {
             if (context.Model.PrimaryNavigation.IsActive)
             {
@@ -449,11 +507,11 @@ namespace Xplorer.Actions
             navigation.ContentEntries = entries;
 
             state = UpdateNavigation(navigation, state);
-            
+
             return state;
         }
 
-        private static NavigationState UpdateNavigation(Navigation navigation, NavigationState state)
+        public static NavigationState UpdateNavigation(Navigation navigation, NavigationState state)
         {
             state = UpdateItems(navigation, state);
             state = UpdateScrollbar(navigation, state);
@@ -501,16 +559,16 @@ namespace Xplorer.Actions
                 .Skip(firstIndex)
                 .Take(lastIndex - firstIndex + 1)
                 .ToArray();
-            
+
             var prevItems = state.Items ?? new NavigationItemState[height];
             var nextItems = new NavigationItemState[prevItems.Length];
 
             for (var i = 0; i < prevItems.Length; i++)
             {
                 var entry = i < visibleEntries.Length ? visibleEntries[i] : null;
-                var isActive = navigation.IsActive && entry == navigation.ActiveEntry;
+                var isActive = navigation.IsActive && entry != null && entry.Name == navigation.ActiveEntry.Name && entry.Type == navigation.ActiveEntry.Type;
                 var isSelected = navigation.SelectedEntries.Contains(entry);
-                
+
                 if (entry == null)
                 {
                     nextItems[i] = null;
@@ -533,7 +591,7 @@ namespace Xplorer.Actions
 
             state = state
                 .Remute(x => x.Items, nextItems);
-            
+
             return state;
         }
 
@@ -608,8 +666,119 @@ namespace Xplorer.Actions
             {
                 index = 1;
             }
-            
+
             return index;
+        }
+
+        private static NavigationState CreateDefaultNavigationState(bool isScrollbarVisible)
+        {
+            var statusbar = new StatusbarState(null);
+            var scrollbar = new ScrollbarState(isScrollbarVisible, 0, 0);
+            var state = new NavigationState(null, statusbar, scrollbar);
+            return state;
+        }
+
+        private static ToolbarState CreateDefaultToolbarState()
+        {
+            return new ToolbarState(
+                new ButtonState("F1 Help", true),
+                new ButtonState("F5 Copy", false),
+                new ButtonState("F6 Move", false),
+                new ButtonState("F7 Rename", false),
+                new ButtonState("F8 Remove", false),
+                null
+            );
+        }
+
+        public static MasterState InterceptTransactionAction(Context context, MasterState state)
+        {
+            return state;
+        }
+
+        public static MasterState UpdateToolbarActions(Context context, MasterState state)
+        {
+            var isCopyEnabled = IsCopyEnabled(context);
+            var isRemoveEnabled = IsRemoveEnabled(context);
+
+            state = state
+                .Remute(x => x.Toolbar.CopyButton.Enabled, isCopyEnabled)
+                .Remute(x => x.Toolbar.MoveButton.Enabled, isCopyEnabled)
+                .Remute(x => x.Toolbar.RemoveButton.Enabled, isRemoveEnabled);
+
+            return state;
+        }
+
+        public static MasterState Copy(Context context, MasterState state)
+        {
+            if (NavigationActions.IsCopyEnabled(context) == false)
+            {
+                return state;
+            }
+
+            var transaction = new CopyTransaction(context);
+            transaction.Start();
+
+            return null;
+        }
+
+        public static bool IsCopyEnabled(Context context)
+        {
+            if (context.Model.Transaction != null)
+            {
+                return false;
+            }
+
+            if (context.PrimaryFileSystem.Location == context.SecondaryFileSystem.Location)
+            {
+                return false;
+            }
+
+            var navigation = GetActiveNavigation(context);
+            var entries = GetNavigationEntriesForTransaction(navigation);
+
+            if (entries.Any() == false)
+            {
+                return false;
+            }
+
+            if (context.Model.PrimaryNavigation.IsActive)
+            {
+                return context.Model.Layout.HasFlag(Layout.SecondaryNavigation);
+            }
+
+            if (context.Model.SecondaryNavigation.IsActive)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsRemoveEnabled(Context context)
+        {
+            if (context.Model.Transaction != null)
+            {
+                return false;
+            }
+
+            var navigation = GetActiveNavigation(context);
+            var entries = GetNavigationEntriesForTransaction(navigation);
+
+            return entries.Any();
+        }
+        public static HashSet<NavigationEntry> GetNavigationEntriesForTransaction(Navigation navigation)
+        {
+            if (navigation.SelectedEntries.Any())
+            {
+                return navigation.SelectedEntries;
+            }
+
+            if (navigation.ActiveEntry != null && navigation.Location != null && navigation.ActiveEntry.Type != NavigationEntryType.NavUpControl)
+            {
+                return new HashSet<NavigationEntry>() { navigation.ActiveEntry };
+            }
+
+            return new HashSet<NavigationEntry>();
         }
     }
 }

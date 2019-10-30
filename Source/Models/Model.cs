@@ -5,5 +5,6 @@ namespace Xplorer.Models
         public Layout Layout { get; set; }
         public Navigation PrimaryNavigation { get; set; }
         public Navigation SecondaryNavigation { get; set; }
+        public Transaction Transaction { get; set; }
     }
 }

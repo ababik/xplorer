@@ -5,7 +5,7 @@ namespace Xplorer.Components
 {
     public class NavigationComponent : Component<NavigationState>
     {
-        public static int ContentHeight => Console.WindowHeight - ToolbarComponent.Height - StatusbarComponent.Height; 
+        public static int ContentHeight => Console.WindowHeight - ToolbarComponent.BaseHeight - StatusbarComponent.BaseHeight; 
         public StatusbarComponent Statusbar { get; }
         public ScrollbarComponent Scrollbar { get; }
         public NavigationItemComponent[] NavigationItems { get; private set; }

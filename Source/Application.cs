@@ -15,12 +15,12 @@ namespace Xplorer
         public static event Action OnResize;
 
         private Context Context { get; }
-        private MasterComponent MasterComponent { get; }
 
         private Application()
         {
             Context = new Context();
-            MasterComponent = new MasterComponent(Context.Theme);
+            Context.State = NavigationActions.Init(Context);
+            Context.Component = new MasterComponent(Context.Theme);
         }
 
         public void Run()
@@ -36,13 +36,17 @@ namespace Xplorer
             Console.Clear();
             Console.CursorVisible = false;
 
-            var state = NavigationActions.Init(Context);
             var width = Console.WindowWidth;
             var height = Console.WindowHeight;
 
             while (true)
             {
-                MasterComponent.Render(state);
+                if (Context.State != null)
+                {
+                    Context.State = NavigationActions.UpdateToolbarActions(Context, Context.State);
+                    Context.Component.Render(Context.State);
+                }
+
                 Console.SetCursorPosition(0, 0);
 
                 var input = Console.ReadKey(true);
@@ -56,51 +60,61 @@ namespace Xplorer
                     height = Console.WindowHeight;
                     
                     OnResize?.Invoke();
-                    state = NavigationActions.Resize(Context, state);
+                    Context.State = NavigationActions.Resize(Context, Context.State);
                 }
 
                 if (input.Key == ConsoleKey.Spacebar)
                 {
-                    state = NavigationActions.Reveal(Context, state);
+                    Context.State = NavigationActions.Reveal(Context, Context.State);
+                    continue;
+                }
+
+                Context.State = NavigationActions.InterceptTransactionAction(Context, Context.State);
+
+                if (Context.Model.Transaction != null)
+                {
                     continue;
                 }
 
                 switch (input.Key)
                 {
                     case ConsoleKey.DownArrow: 
-                        state = NavigationActions.MoveDown(Context, state);
+                        Context.State = NavigationActions.MoveDown(Context, Context.State);
                         break;
                     case ConsoleKey.UpArrow: 
-                        state = NavigationActions.MoveUp(Context, state);
+                        Context.State = NavigationActions.MoveUp(Context, Context.State);
                         break;
                     case ConsoleKey.LeftArrow: 
-                        state = NavigationActions.MoveLeft(Context, state);
+                        Context.State = NavigationActions.MoveLeft(Context, Context.State);
                         break;
                     case ConsoleKey.RightArrow:
-                        state = NavigationActions.MoveRight(Context, state);
+                        Context.State = NavigationActions.MoveRight(Context, Context.State);
                         break;
                     case ConsoleKey.Enter: 
-                        state = NavigationActions.Navigate(Context, state);
+                        Context.State = NavigationActions.Navigate(Context, Context.State);
                         break;
                     case ConsoleKey.Escape:
-                        state = NavigationActions.Escape(Context, state);
+                        Context.State = NavigationActions.Escape(Context, Context.State);
                         break;
                     case ConsoleKey.Backspace:
-                        state = NavigationActions.Back(Context, state);
+                        Context.State = NavigationActions.Back(Context, Context.State);
+                        break;
+                    case ConsoleKey.F5:
+                        Context.State = NavigationActions.Copy(Context, Context.State);
                         break;
                 }
 
                 switch (input.KeyChar)
                 {
-                    case ']': state = NavigationActions.ToggleSecondaryNavigation(Context, state); break;
-                    case '[': state = NavigationActions.TogglePrimaryNavigation(Context, state); break;
-                    case '/': state = NavigationActions.ToggleSelectedItem(Context, state); break;
-                    case '?': state = NavigationActions.RevertSelectedItems(Context, state); break;
+                    case ']': Context.State = NavigationActions.ToggleSecondaryNavigation(Context, Context.State); break;
+                    case '[': Context.State = NavigationActions.TogglePrimaryNavigation(Context, Context.State); break;
+                    case '/': Context.State = NavigationActions.ToggleSelectedItem(Context, Context.State); break;
+                    case '?': Context.State = NavigationActions.RevertSelectedItems(Context, Context.State); break;
                 }
 
                 if (char.IsLetterOrDigit(input.KeyChar))
                 {
-                    state = NavigationActions.ApplyFilter(Context, state, input.KeyChar);
+                    Context.State = NavigationActions.ApplyFilter(Context, Context.State, input.KeyChar);
                 }
             }
         }

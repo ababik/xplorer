@@ -5,7 +5,7 @@ namespace Xplorer.Components
 {
     public class StatusbarComponent : Component<StatusbarState>
     {
-        public static int Height => 1;
+        public static int BaseHeight => 1;
 
         public StatusbarComponent(ITheme theme) : base(theme)
         {

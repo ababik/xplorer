@@ -14,5 +14,9 @@ namespace Xplorer
         ConsoleColor GetSelectedEntryColor();
         ConsoleColor GetScrollBackgroundColor();
         ConsoleColor GetScrollGripColor();
+        ConsoleColor GetEnabledButtonBackgroundColor();
+        ConsoleColor GetEnabledButtonForegroundColor();
+        ConsoleColor GetDisabledButtonBackgroundColor();
+        ConsoleColor GetDisabledButtonForegroundColor();
     }
 }

@@ -59,7 +59,28 @@ namespace Xplorer.Themes
         {
             return ConsoleColor.Gray;
         }
+
         public ConsoleColor GetScrollGripColor()
+        {
+            return ConsoleColor.DarkGray;
+        }
+
+        public ConsoleColor GetEnabledButtonBackgroundColor()
+        {
+            return ConsoleColor.Blue;
+        }
+
+        public ConsoleColor GetEnabledButtonForegroundColor()
+        {
+            return MainForegroundColor;
+        }
+
+        public ConsoleColor GetDisabledButtonBackgroundColor()
+        {
+            return ConsoleColor.Gray;
+        }
+
+        public ConsoleColor GetDisabledButtonForegroundColor()
         {
             return ConsoleColor.DarkGray;
         }

@@ -47,7 +47,7 @@ namespace Xplorer.Components
             SecondaryNavigation?.Render(State.SecondaryNavigation);
             
             Toolbar.Position(Console.WindowHeight - 1, 0, Console.WindowWidth - 1, 1);
-            Toolbar.Render();
+            Toolbar.Render(State.Toolbar);
         }
     }
 }
