@@ -1,12 +1,11 @@
-namespace Xplorer.States
+namespace Xplorer.States;
+
+public class StatusbarState
 {
-    public class StatusbarState
+    public string Status { get; }
+    
+    public StatusbarState(string status)
     {
-        public string Status { get; }
-        
-        public StatusbarState(string status)
-        {
-            Status = status;
-        }
+        Status = status;
     }
 }

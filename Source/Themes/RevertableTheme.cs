@@ -1,88 +1,87 @@
 using System;
 
-namespace Xplorer.Themes
+namespace Xplorer.Themes;
+
+internal class RevertableTheme : ITheme
 {
-    internal class RevertableTheme : ITheme
+    private ConsoleColor MainBackgroundColor { get; }
+    private ConsoleColor MainForegroundColor { get; }
+
+    public static bool IsSupported => (int)Console.BackgroundColor != -1;
+
+    public RevertableTheme()
     {
-        private ConsoleColor MainBackgroundColor { get; }
-        private ConsoleColor MainForegroundColor { get; }
+        MainBackgroundColor = Console.BackgroundColor;
+        MainForegroundColor = Console.ForegroundColor;
+    }
 
-        public static bool IsSupported => (int)Console.BackgroundColor != -1;
+    public virtual ConsoleColor GetCursorBackgroundColor()
+    {
+        return MainForegroundColor;
+    }
 
-        public RevertableTheme()
-        {
-            MainBackgroundColor = Console.BackgroundColor;
-            MainForegroundColor = Console.ForegroundColor;
-        }
+    public virtual ConsoleColor GetCursorForegroundColor()
+    {
+        return MainBackgroundColor;
+    }
 
-        public virtual ConsoleColor GetCursorBackgroundColor()
-        {
-            return MainForegroundColor;
-        }
+    public ConsoleColor GetErrorForegroundColor()
+    {
+        return ConsoleColor.Red;
+    }
 
-        public virtual ConsoleColor GetCursorForegroundColor()
-        {
-            return MainBackgroundColor;
-        }
+    public ConsoleColor GetMarkerDirectoryColor()
+    {
+        return ConsoleColor.Yellow;
+    }
 
-        public ConsoleColor GetErrorForegroundColor()
-        {
-            return ConsoleColor.Red;
-        }
+    public ConsoleColor GetMarkerDocumentColor()
+    {
+        return ConsoleColor.Cyan;
+    }
 
-        public ConsoleColor GetMarkerDirectoryColor()
-        {
-            return ConsoleColor.Yellow;
-        }
+    public ConsoleColor GetMarkerExecutableColor()
+    {
+        return ConsoleColor.Green;
+    }
 
-        public ConsoleColor GetMarkerDocumentColor()
-        {
-            return ConsoleColor.Cyan;
-        }
+    public ConsoleColor GetMarkerEmptyColor()
+    {
+        return ConsoleColor.Gray;
+    }
 
-        public ConsoleColor GetMarkerExecutableColor()
-        {
-            return ConsoleColor.Green;
-        }
+    public ConsoleColor GetSelectedEntryColor()
+    {
+        return ConsoleColor.Yellow;
+    }
 
-        public ConsoleColor GetMarkerEmptyColor()
-        {
-            return ConsoleColor.Gray;
-        }
+    public ConsoleColor GetScrollBackgroundColor()
+    {
+        return ConsoleColor.Gray;
+    }
 
-        public ConsoleColor GetSelectedEntryColor()
-        {
-            return ConsoleColor.Yellow;
-        }
+    public ConsoleColor GetScrollGripColor()
+    {
+        return ConsoleColor.DarkGray;
+    }
 
-        public ConsoleColor GetScrollBackgroundColor()
-        {
-            return ConsoleColor.Gray;
-        }
+    public ConsoleColor GetEnabledButtonBackgroundColor()
+    {
+        return ConsoleColor.Blue;
+    }
 
-        public ConsoleColor GetScrollGripColor()
-        {
-            return ConsoleColor.DarkGray;
-        }
+    public ConsoleColor GetEnabledButtonForegroundColor()
+    {
+        return MainForegroundColor;
+    }
 
-        public ConsoleColor GetEnabledButtonBackgroundColor()
-        {
-            return ConsoleColor.Blue;
-        }
+    public ConsoleColor GetDisabledButtonBackgroundColor()
+    {
+        return ConsoleColor.Gray;
+    }
 
-        public ConsoleColor GetEnabledButtonForegroundColor()
-        {
-            return MainForegroundColor;
-        }
-
-        public ConsoleColor GetDisabledButtonBackgroundColor()
-        {
-            return ConsoleColor.Gray;
-        }
-
-        public ConsoleColor GetDisabledButtonForegroundColor()
-        {
-            return ConsoleColor.DarkGray;
-        }
+    public ConsoleColor GetDisabledButtonForegroundColor()
+    {
+        return ConsoleColor.DarkGray;
     }
 }

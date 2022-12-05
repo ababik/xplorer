@@ -1,9 +1,8 @@
 using Xplorer.Models;
 
-namespace Xplorer
+namespace Xplorer;
+
+public interface IOperationSystem
 {
-    public interface IOperationSystem
-    {
-        void Reveal(Navigation navigation);
-    }
+    void Reveal(Navigation navigation);
 }

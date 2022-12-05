@@ -1,12 +1,11 @@
 using System;
 
-namespace Xplorer.Models
+namespace Xplorer.Models;
+
+[Flags]
+public enum Layout
 {
-    [Flags]
-    public enum Layout
-    {
-        None = 0,
-        PrimaryNavigation = 1 << 0,
-        SecondaryNavigation = 1 << 1
-    }
+    None = 0,
+    PrimaryNavigation = 1 << 0,
+    SecondaryNavigation = 1 << 1
 }

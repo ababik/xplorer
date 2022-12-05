@@ -1,30 +1,29 @@
 using System;
 using Xplorer.States;
 
-namespace Xplorer.Models
+namespace Xplorer.Models;
+
+public abstract class Transaction
 {
-    public abstract class Transaction
+    protected Context Context { get; }
+
+    protected Transaction(Context context)
     {
-        protected Context Context { get; }
+        Context = context;
+    }
 
-        protected Transaction(Context context)
-        {
-            Context = context;
-        }
+    public virtual void Start()
+    {
+        Context.Model.Transaction = this;
+    }
 
-        public virtual void Start()
-        {
-            Context.Model.Transaction = this;
-        }
+    public virtual void Complete()
+    {
+        Context.Model.Transaction = null;
+    }
 
-        public virtual void Complete()
-        {
-            Context.Model.Transaction = null;
-        }
-
-        public virtual void Render()
-        {
-            Context.Component.Render(Context.State);
-        }
+    public virtual void Render()
+    {
+        Context.Component.Render(Context.State);
     }
 }

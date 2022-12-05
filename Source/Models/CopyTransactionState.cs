@@ -1,9 +1,8 @@
-namespace Xplorer.Models
+namespace Xplorer.Models;
+
+public enum CopyTransactionState
 {
-    public enum CopyTransactionState
-    {
-        Check,
-        Confirm,
-        Process,
-    }
+    Check,
+    Confirm,
+    Process,
 }

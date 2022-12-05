@@ -6,12 +6,12 @@ namespace Xplorer.Themes
     {
         public override ConsoleColor GetCursorBackgroundColor()
         {
-            return ConsoleColor.Black;
+            return ConsoleColor.White;
         }
 
         public override ConsoleColor GetCursorForegroundColor()
         {
-            return ConsoleColor.White;
+            return ConsoleColor.Black;
         }
     }
 }

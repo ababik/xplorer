@@ -1,26 +1,25 @@
 using System;
 using Xplorer.States;
 
-namespace Xplorer.Components
+namespace Xplorer.Components;
+
+public class StatusbarComponent : Component<StatusbarState>
 {
-    public class StatusbarComponent : Component<StatusbarState>
+    public static int BaseHeight => 1;
+
+    public StatusbarComponent(ITheme theme) : base(theme)
     {
-        public static int BaseHeight => 1;
+        Application.OnResize += HandleResize;
+    }
 
-        public StatusbarComponent(ITheme theme) : base(theme)
-        {
-            Application.OnResize += HandleResize;
-        }
+    private void HandleResize()
+    {
+        State = null;
+    }
 
-        private void HandleResize()
-        {
-            State = null;
-        }
-
-        public override void Render()
-        {
-            Console.SetCursorPosition(Left, Top);
-            Write(State.Status);
-        }
+    public override void Render()
+    {
+        Console.SetCursorPosition(Left, Top);
+        Write(State.Status);
     }
 }

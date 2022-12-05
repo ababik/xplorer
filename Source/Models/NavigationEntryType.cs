@@ -1,10 +1,9 @@
-namespace Xplorer.Models
+namespace Xplorer.Models;
+
+public enum NavigationEntryType
 {
-    public enum NavigationEntryType
-    {
-        NavUpControl,
-        Drive,
-        Directory,
-        File
-    }
+    NavUpControl,
+    Drive,
+    Directory,
+    File
 }

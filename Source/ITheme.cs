@@ -1,22 +1,21 @@
 using System;
 
-namespace Xplorer
+namespace Xplorer;
+
+public interface ITheme
 {
-    public interface ITheme
-    {
-        ConsoleColor GetCursorBackgroundColor();
-        ConsoleColor GetCursorForegroundColor();
-        ConsoleColor GetErrorForegroundColor();
-        ConsoleColor GetMarkerDirectoryColor();
-        ConsoleColor GetMarkerExecutableColor();
-        ConsoleColor GetMarkerDocumentColor();
-        ConsoleColor GetMarkerEmptyColor();
-        ConsoleColor GetSelectedEntryColor();
-        ConsoleColor GetScrollBackgroundColor();
-        ConsoleColor GetScrollGripColor();
-        ConsoleColor GetEnabledButtonBackgroundColor();
-        ConsoleColor GetEnabledButtonForegroundColor();
-        ConsoleColor GetDisabledButtonBackgroundColor();
-        ConsoleColor GetDisabledButtonForegroundColor();
-    }
+    ConsoleColor GetCursorBackgroundColor();
+    ConsoleColor GetCursorForegroundColor();
+    ConsoleColor GetErrorForegroundColor();
+    ConsoleColor GetMarkerDirectoryColor();
+    ConsoleColor GetMarkerExecutableColor();
+    ConsoleColor GetMarkerDocumentColor();
+    ConsoleColor GetMarkerEmptyColor();
+    ConsoleColor GetSelectedEntryColor();
+    ConsoleColor GetScrollBackgroundColor();
+    ConsoleColor GetScrollGripColor();
+    ConsoleColor GetEnabledButtonBackgroundColor();
+    ConsoleColor GetEnabledButtonForegroundColor();
+    ConsoleColor GetDisabledButtonBackgroundColor();
+    ConsoleColor GetDisabledButtonForegroundColor();
 }

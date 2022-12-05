@@ -1,11 +1,10 @@
 using Xplorer.Models;
 
-namespace Xplorer.OperationSystems
+namespace Xplorer.OperationSystems;
+
+internal class LinuxOperationSystem : IOperationSystem
 {
-    internal class LinuxOperationSystem : IOperationSystem
+    public void Reveal(Navigation navigation)
     {
-        public void Reveal(Navigation navigation)
-        {
-        }
     }
 }
